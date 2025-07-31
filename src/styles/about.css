@@ -1,0 +1,98 @@
+/* Hero Section */
+.about-hero {
+  height: 500px;
+  background-image: url('/public/images/printer-nature-concept.jpg'); 
+  background-size: cover;
+  background-position: center;
+  position: relative;
+
+}
+
+.about-hero .overlay {
+  background-color: rgba(15, 115, 187, 0.345); /* Light blue overlay */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* General Section Styling */
+section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* Vision & Mission cards */
+.bg-white.shadow.rounded {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
+}
+
+/* Headings */
+h1
+h2,
+h3,
+h5,
+h6 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+p {
+  font-size: 1.125rem; /* 18px */
+  color: #333;
+}
+
+/* Team Section */
+.team-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1.05rem;
+}
+
+.team-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Team Image */
+.team-card img {
+  height: 50px;
+  margin-bottom: 1rem;
+}
+
+/* Priority Section */
+.priority-section p {
+  font-size: 1.2rem;
+  color: #444;
+}
+
+.priority-section img {
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .about-hero {
+    height: 280px;
+  }
+
+  .priority-section img {
+    width: 100%;
+    height: auto;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}

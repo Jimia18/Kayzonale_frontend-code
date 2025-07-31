@@ -1,0 +1,75 @@
+/* services.css
+
+Hero Carousel Section
+.hero-carousel {
+  height: 500px;
+  position: relative;
+}
+
+.hero-carousel .carousel-item {
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-carousel .carousel-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Overlay */
+  /* z-index: 1;
+}
+
+.hero-carousel .carousel-caption {
+  z-index: 2;
+  position: relative;
+}
+
+Services Grid
+.services-grid {
+  padding: 3rem 1rem;
+  background-color: #f9f9f9;
+}
+
+.services-grid .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+}
+
+.services-grid .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.services-grid .card-img-top {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  margin-top: 1rem;
+}
+
+.services-grid .card-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.services-grid .card-text {
+  color: #666;
+  font-size: 1.5rem;
+  padding: 0 1rem;
+}
+
+CTA Button
+.services-cta {
+  margin: 3rem 0;
+}
+
+.services-cta .btn {
+  font-size: 1.5rem;
+  padding: 0.75rem 2rem;
+  border-radius: 30px;
+} */ 

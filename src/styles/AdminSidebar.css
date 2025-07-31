@@ -1,0 +1,13 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.main-content {
+  margin-left: 240px; /* match sidebar width */
+  padding: 2rem;
+  flex: 1;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+}

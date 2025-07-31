@@ -1,0 +1,15 @@
+.portfolio-intro {
+  height: 500px;
+  background-image: url('/public/images/png-transparent-digital-printing-flyer-business-cards-reprography-web-design-web-design-flyer-industry.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.portfolio-intro .overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.portfolio .container{
+  max-width: 30rem;
+}

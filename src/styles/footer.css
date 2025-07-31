@@ -1,0 +1,20 @@
+/* Footer.css */
+.custom-footer {
+  /* background-color: rgba(115, 168, 221, 0.682); Light blue with 70% opacity */
+  color: #000;
+}
+
+.footer-link {
+  color: #000;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #0f74bb; /* Darker blue on hover */
+  text-decoration: underline;
+}
+
+.custom-footer ul li {
+  margin-bottom: 0.5rem;
+}
