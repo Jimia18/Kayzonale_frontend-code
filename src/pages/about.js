@@ -43,18 +43,19 @@ const AboutPage = () => {
         <div className="container text-center">
           <h3 className="fw-bold mb-4">Our Team</h3>
           <p className="mb-5 mx-auto" style={{ maxWidth: '600px' }}>
-            We offer a wide range of printing and branding services:
+           Our team specializes in a diverse range of professional printing and branding services, combining creativity, precision,
+           and experience to bring your vision to life.
           </p>
 
           <div className="row justify-content-center g-4">
             {[1, 2, 3,4].map((_, i) => (
               <div key={i} className="col-md-4">
                 <div className="bg-white p-3 rounded shadow text-center h-100">
-                  <img src="/images/ceo-icon.png" alt="Team Member" style={{ height: '40px' }} className="mb-3" />
+                  <img src="/images/IMG-20250724-WA0039.jpg" alt="Team Member" style={{ height: '80px' }} className="mb-3" />
                   <h6 className="fw-bold">Atoo Kay Simporoza</h6>
                   <p className="mb-1">Founder & CEO</p>
-                  <p className="mb-1" style={{ fontSize: '0.9rem' }}>+256 777 274 639</p>
-                  <p className="mb-0" style={{ fontSize: '0.9rem' }}>kayzonaledesigns@gmail.com</p>
+                  <p className="mb-1" style={{ fontSize: '0.9rem', paddingBottom: '0.5rem' }}>+256 777 274 639</p>
+                  <p className="mb-0" style={{ fontSize: '0.9rem', paddingBottom: '0.5rem' }}>kayzonaledesigns@gmail.com</p>
                 </div>
               </div>
             ))}

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import '../styles/home.css';
 import GetQuote from '../components/getQuote';
 import HeroSlider from '../components/HeroSlider';
+import Product from '../components/Products';
+import Testimonials from '../components/testimonials';
 
 const HomePage = () => {
   const [showQuoteForm, setShowQuoteForm] = useState(false);
@@ -12,7 +14,10 @@ const HomePage = () => {
       {/* Hero Section */}
       <HeroSlider onQuoteClick={() => setShowQuoteForm(true)} />
 
-      {/* About Section */}
+      {/* Featured Products Section */}
+      <Product />
+
+      {/* About Section
       <section className="py-5 bg-info bg-opacity-25 text-dark pt-5 pb-3">
         <div className="container">
           <div className="row align-items-center">
@@ -25,7 +30,7 @@ const HomePage = () => {
                 A quality printing and promotional products company.
                 Full service printing experience at the point when quality truly matters.
                 Taking your needs seriously. Bringing your print to life. The right kind of solutions.
-              </p>
+              </p>      
               <a
                 style={{ fontSize: "1.5rem", padding: "1rem 3rem" }}
                 href="/about"
@@ -41,98 +46,99 @@ const HomePage = () => {
 
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Services Section */}
-      <section className="py-5 bg-white">
-        <div className="container text-center">
-          <h2 style={{ fontSize: '2.5rem' }} className="fw-bold">
-            Our Premier <span className="text-danger">Services</span>
-          </h2>
-          <p style={{ fontSize: '1.3rem' }} className="mb-5">
-            <strong>We offer a wide range of printing and branding services</strong>:
-          </p>
+      {/* Interactive Service Highlight Section */}
+<section className="position-relative overflow-hidden py-5 text-dark" style={{ background: 'linear-gradient(-45deg, #f0f8ff, #fff0f5, #e6ffe6, #fffaf0)', backgroundSize: '400% 400%', animation: 'gradientBG 15s ease infinite' }}>
+  <div className="container">
+    <div className="row align-items-center">
 
-          <div className="row g-4 justify-content-center">
+      {/* Left Cards */}
+      <div className="col-md-6">
+        <div className="row g-4">
 
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/printerIcon.png" alt="Print Solutions" height="50" className="mb-3" />
-                <h6 className="fw-bold">Print Solutions</h6>
-                <p className="text-muted mb-4">
-                  Business cards, brochures, flyers, calendars and banners for all your marketing needs
-                </p>
-              </div>
+          <div className="col-6">
+            <div className="p-4 bg-white rounded shadow h-100 interactive-card text-center">
+              <img src="/images/printerIcon.png" alt="Print" width="60" className="mb-3" />
+              <h5 className="fw-semibold mb-2">Printing Services</h5>
+              <p className="text-muted small">
+                Print, flyer, and pamphlet solutions with a legacy of quality.
+              </p>
             </div>
-
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/photocopier.png" alt="Stationery" height="50" className="mb-3" />
-                <h6 className="fw-bold">Stationery Design Services</h6>
-                <p className="text-muted mb-4">
-                  Photocopying and Scanning services for documents, IDs, and forms.
-                  Whether for personal or business use,
-                  we deliver clear, high-quality results in both black & white and color.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/LargeFomatPrinter.png" alt="Large Format" height="50" className="mb-3" />
-                <h6 className="fw-bold">Large Format Printing</h6>
-                <p className="text-muted mb-4">
-                  For banners, posters, backdrops, signage, and more. Ideal for events, advertising,
-                  and branding, our prints are bold, high resolution, and made to stand out indoors or outdoors.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/plotting.png" alt="Creative" height="50" className="mb-3" />
-                <h6 className="fw-bold">Plotting</h6>
-                <p className="text-muted mb-4">
-                  For architectural plans, engineering drawings, and other technical documents.
-                  Whether black & white or color, our plots are clear, accurate, and ready for presentation or submission
-                </p>
-              </div>
-            </div>
-
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/branding.jpeg" alt="Branding" height="50" className="mb-3" />
-                <h6 className="fw-bold">Brand Identity Design</h6>
-                <p className="text-muted mb-4">
-                  We help build your brand identity through expert design services logos,color schemes, typography,
-                  and marketing materials that communicate your unique story and make a lasting impression.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-md-4 col-sm-6">
-              <div>
-                <img src="/images/embroidery.png" alt="Packaging" height="50" className="mb-3" />
-                <h6 className="fw-bold">Embroidery</h6>
-                <p className="text-muted mb-4">
-                  Embroidery Design Solutions
-                  For all your uniform and merchandise designs
-                </p>
-              </div>
-            </div>
-
           </div>
 
-          <div className="mt-5">
-            <a style={{ fontSize: "1.5rem", padding: "1rem 3rem" }} href="/services" className="btn btn-primary">
-              Explore our Services
-            </a>
+          <div className="col-6">
+            <div className="p-4 bg-white rounded shadow h-100 interactive-card text-center">
+              <img src="/images/LargeFomatPrinter.png" alt="Scan" width="60" className="mb-3" />
+              <h5 className="fw-semibold mb-2">Large Format Printing</h5>
+              <p className="text-muted small">
+                For banners, posters, backdrops, signage, and more. 
+                Bold, high-resolution prints made to stand out indoors or outdoors.
+              </p>
+            </div>
           </div>
+
         </div>
-      </section>
+      </div>
+
+      {/* Right Text + Button */}
+      <div className="col-md-6 mt-5 mt-md-0 text-center text-md-start px-md-5">
+        <h6 className="text-danger text-uppercase fw-bold mb-2" style={{ fontSize: '1rem' }}>
+          Printing Made Easy
+        </h6>
+        <h2 className="fw-bold display-5 mb-3" style={{ fontSize: '2.5rem' }}>
+          Fast and Quality <br /> Service
+        </h2>
+        <p className="text-muted mb-4" style={{ fontSize: '1.1rem', lineHeight: '1.7' }}>
+          More than duplicates — we do it right! From flyers to banners, our high-quality
+          print services deliver what your brand deserves.
+        </p>
+        <a href="/services" className="btn btn-danger btn-lg shadow px-4 py-2" style={{ fontSize: '1.1rem' }}>
+          Learn More
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section className="py-5 position-relative" style={{
+  background: 'linear-gradient(to right, #fbefff, #e0f7fa, #f9f9f9)',
+  overflow: 'hidden'
+}}>
+  <div className="container">
+    <div className="row align-items-center justify-content-between text-center text-md-start">
+
+      {/* Left Product Image */}
+      <div className="col-md-3 mb-4 mb-md-0">
+        <img src="/images/package-mockup.png" alt="Package" className="img-fluid" style={{ maxHeight: '320px' }} />
+      </div>
+
+      {/* Center Text + CTA */}
+      <div className="col-md-6">
+        <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem' }}>
+          Let’s brand yo <br /> <span className="text-uppercase" style={{ color: '#e6007e' }}>KASAATI…</span>
+        </h2>
+        <p className="mb-4 fs-5">Printed and delivered on demand!</p>
+        <a href="/shop" className="btn btn-primary px-4 py-2 fs-5" style={{ background: '#e6007e', border: 'none' }}>
+          Shop Now &rarr;
+        </a>
+      </div>
+
+      {/* Right Product Image */}
+      <div className="col-md-3 mt-4 mt-md-0">
+        <img src="/images/tshirt-mockup.png" alt="T-shirt" className="img-fluid" style={{ maxHeight: '320px' }} />
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<Testimonials />
 
       {/* Portfolio Section */}
-      <section className="text-white text-center portfolio-intro d-flex align-items-center" style={{ height: '300px', position: 'relative' }}>
+      {/* <section className="text-white text-center portfolio-intro d-flex align-items-center" style={{ height: '300px', position: 'relative' }}>
         <div className="overlay position-absolute w-100 h-100" style={{ backgroundColor: 'rgba(0,0,0,0.5)', top: 0, left: 0, zIndex: 1 }}></div>
         <div className="container position-relative z-2">
           <h2 className="display-4 fw-bold">Our Portfolio</h2>
@@ -173,7 +179,7 @@ const HomePage = () => {
             Explore Full Portfolio
           </a>
         </div>
-      </section>
+      </section> */}
 
       {/* Quote Section */}
       <section className="py-5 text-center fst-italic ">

@@ -1,20 +1,153 @@
-/* Footer.css */
-.custom-footer {
-  /* background-color: rgba(115, 168, 221, 0.682); Light blue with 70% opacity */
+/* .custom-footer .footer-link {
   color: #000;
+  text-decoration: none;
+  font-size: 0.9rem;
 }
 
+.custom-footer .footer-link:hover {
+  color: #172439;
+  text-decoration: underline;
+}
+
+.custom-footer .small-title {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.custom-footer .small-text {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.custom-footer p,
+.custom-footer li {
+  margin-bottom: 0.25rem;
+}
+
+.custom-footer hr {
+  margin: 0.5rem 0;
+} */
+
+/* .footer-link {
+  color: #444;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.footer-link:hover {
+  color: hotpink;
+  text-decoration: underline;
+}
+
+.btn-hotpink {
+  background-color: hotpink;
+  color: white;
+  border: none;
+}
+
+.btn-hotpink:hover {
+  background-color: #e6007e;
+  color: white;
+}
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+} */
+
+.custom-footer {
+  padding: 0  0; /* top/bottom, left/right */
+  margin: 0.25rem 0 0 0; /* top, right, bottom, left */
+}
+.custom-footer {
+  font-size: 0.9rem;
+}
+
+
 .footer-link {
-  color: #000;
+  color: black;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .footer-link:hover {
-  color: #0f74bb; /* Darker blue on hover */
-  text-decoration: underline;
+  color: hotpink;
 }
 
-.custom-footer ul li {
-  margin-bottom: 0.5rem;
+
+.footer-social .hover-toggle {
+  position: relative;
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+  text-decoration: none;
+}
+
+.footer-social .hover-toggle .icon {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 16px;
+}
+
+.footer-social .hover-toggle .text {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.footer-social .hover-toggle:hover .text {
+  opacity: 0;
+}
+
+.footer-social .hover-toggle:hover .icon {
+  opacity: 1;
+}
+
+.footer-social .hover-toggle:hover {
+  color: hotpink;
+}
+
+.btn-hotpink {
+  background-color: hotpink;
+  color: white;
+  border: none;
+}
+
+.btn-hotpink:hover {
+  background-color: #ff69b4;
+  color: white;
+}
+.custom-footer {
+  font-size: 1rem; /* Default: 16px */
+}
+
+@media (min-width: 768px) {
+  .custom-footer {
+    font-size: 1.1rem; /* Slightly larger on tablets/desktops */
+  }
+}
+
+@media (min-width: 1200px) {
+  .custom-footer {
+    font-size: 1.2rem; /* Larger on wide screens */
+  }
+}
+
+.footer-bottom {
+  /*background-color: #f8f9fa; Optional: light background */
+  font-size: 0.95rem;
+}
+
+.payment-icons img {
+  object-fit: contain;
+  border-radius: 4px;
+  background: white;
+  padding: 0 0;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
 }

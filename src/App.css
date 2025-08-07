@@ -1,3 +1,4 @@
+/* ========== RESET & BASE STYLES ========== */
 * {
   margin: 0;
   padding: 0;
@@ -6,5 +7,62 @@
 
 html, body {
   height: 100%;
-  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ========== FULL LAYOUT ========== */
+body,
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* This class can be used to wrap page content */
+.page-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+}
+
+/* ========== TOASTIFY FIX ========== */
+.Toastify__toast-container {
+  position: fixed !important;
+  top: 1rem;
+  right: 1rem;
+ /* z-index: 1056;  Above Bootstrap modals */
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+.Toastify__toast {
+  pointer-events: all;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes slideFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-fade-in {
+  animation: slideFadeIn 1s ease forwards;
 }

@@ -1,0 +1,12 @@
+.featured-section h2.heading-underline::after {
+  content: '';
+  display: block;
+  height: 5px;
+  background: linear-gradient(to right, #a6e3a1, #fff);
+  width: 60%;
+  margin: 0.5rem auto 0;
+}
+
+.text-pink {
+  color: #e5007d;
+}

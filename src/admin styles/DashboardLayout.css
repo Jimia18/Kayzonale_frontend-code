@@ -1,0 +1,7 @@
+.sidebar.open {
+  width: 250px !important;
+}
+
+.sidebar.closed {
+  width: 0 !important;
+}

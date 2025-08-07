@@ -43,3 +43,21 @@
 .portfolio .container{
   max-width: 30rem;
 }
+
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.interactive-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  min-height: 220px;
+}
+.interactive-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
