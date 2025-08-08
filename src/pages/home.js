@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../styles/home.css';
 import GetQuote from '../components/getQuote';
 import HeroSlider from '../components/HeroSlider';
-import Product from '../components/Products';
+// import Product from '../components/Products';
 import Testimonials from '../components/testimonials';
 
 const HomePage = () => {
@@ -15,7 +15,7 @@ const HomePage = () => {
       <HeroSlider onQuoteClick={() => setShowQuoteForm(true)} />
 
       {/* Featured Products Section */}
-      <Product />
+      {/* <Product  /> */}
 
       {/* About Section
       <section className="py-5 bg-info bg-opacity-25 text-dark pt-5 pb-3">
@@ -49,7 +49,8 @@ const HomePage = () => {
       </section> */}
 
       {/* Interactive Service Highlight Section */}
-<section className="position-relative overflow-hidden py-5 text-dark" style={{ background: 'linear-gradient(-45deg, #f0f8ff, #fff0f5, #e6ffe6, #fffaf0)', backgroundSize: '400% 400%', animation: 'gradientBG 15s ease infinite' }}>
+<section className="position-relative overflow-hidden py-5 text-dark rounded-shadow " 
+style={{ background: 'linear-gradient(-45deg, #6faaddff, #ae7588aa, #b6ecefff, #b1aea9ff)', backgroundSize: '400% 400%', animation: 'gradientBG 15s ease infinite' }}>
   <div className="container">
     <div className="row align-items-center">
 
@@ -77,12 +78,32 @@ const HomePage = () => {
               </p>
             </div>
           </div>
+          <div className="col-6">
+            <div className="p-4 bg-white rounded shadow h-100 interactive-card text-center">
+              <img src="/images/photocopier.png" alt="Print" width="60" className="mb-3" />
+              <h5 className="fw-semibold mb-2">Stationary Design Services</h5>
+              <p className="text-muted small">
+                Photocopying and Scanning services for documents, IDs, and forms. Clear, 
+                high-quality results in both black & white and color.
+              </p>
+            </div>
+          </div>
+          <div className="col-6">
+            <div className="p-4 bg-white rounded shadow h-100 interactive-card text-center">
+              <img src="/images/embroidery.png" alt="Print" width="60" className="mb-3" />
+              <h5 className="fw-semibold mb-2">Embroidery Services</h5>
+              <p className="text-muted small">
+                Embroidery design solutions for uniforms and merchandise. 
+                High-quality stitching to represent your brand.
+              </p>
+            </div>
+          </div>
 
         </div>
       </div>
 
       {/* Right Text + Button */}
-      <div className="col-md-6 mt-5 mt-md-0 text-center text-md-start px-md-5">
+      <div className="col-md-6 text-center text-md-start " style={{paddingLeft:'4rem',paddingTop:'6rem'}}>
         <h6 className="text-danger text-uppercase fw-bold mb-2" style={{ fontSize: '1rem' }}>
           Printing Made Easy
         </h6>
@@ -93,7 +114,7 @@ const HomePage = () => {
           More than duplicates — we do it right! From flyers to banners, our high-quality
           print services deliver what your brand deserves.
         </p>
-        <a href="/services" className="btn btn-danger btn-lg shadow px-4 py-2" style={{ fontSize: '1.1rem' }}>
+        <a href="/services" className="btn btn-danger btn-lg shadow px-4 py-2 i" style={{ fontSize: '1.1rem' }}>
           Learn More
         </a>
       </div>
@@ -103,7 +124,7 @@ const HomePage = () => {
 </section>
 
 <section className="py-5 position-relative" style={{
-  background: 'linear-gradient(to right, #fbefff, #e0f7fa, #f9f9f9)',
+  background: 'linear-gradient(to right, #1591c3ff, #92ccd4ff, #cee9ecff)',
   overflow: 'hidden'
 }}>
   <div className="container">
@@ -111,13 +132,13 @@ const HomePage = () => {
 
       {/* Left Product Image */}
       <div className="col-md-3 mb-4 mb-md-0">
-        <img src="/images/package-mockup.png" alt="Package" className="img-fluid" style={{ maxHeight: '320px' }} />
+        <img src="/images/abt.png" alt="Package" className="img-fluid" style={{ maxHeight: '320px' }} />
       </div>
 
       {/* Center Text + CTA */}
-      <div className="col-md-6">
+      <div className="col-md-6" style={{paddingLeft: '6rem'}}>
         <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem' }}>
-          Let’s brand yo <br /> <span className="text-uppercase" style={{ color: '#e6007e' }}>KASAATI…</span>
+          Let’s brand you <br /> <span className="text-uppercase" style={{ color: '#e6007e' }}>NOW…</span>
         </h2>
         <p className="mb-4 fs-5">Printed and delivered on demand!</p>
         <a href="/shop" className="btn btn-primary px-4 py-2 fs-5" style={{ background: '#e6007e', border: 'none' }}>
@@ -127,7 +148,7 @@ const HomePage = () => {
 
       {/* Right Product Image */}
       <div className="col-md-3 mt-4 mt-md-0">
-        <img src="/images/tshirt-mockup.png" alt="T-shirt" className="img-fluid" style={{ maxHeight: '320px' }} />
+        <img src="/images/IMG-20250724-WA0039.jpg" alt="T-shirt" className="img-fluid" style={{ maxHeight: '200px' }} />
       </div>
 
     </div>

@@ -176,7 +176,7 @@ const AdminSidebar = ({ show, onHide, isMobile }) => {
               }
               onClick={onHide}
             >
-              Dashboard
+              Home
             </NavLink>
           </Nav.Item>
 
@@ -185,7 +185,8 @@ const AdminSidebar = ({ show, onHide, isMobile }) => {
             <Button
               variant="link"
               onClick={() => setOpenManagement(!openManagement)}
-              className="text-white text-start w-100 p-0"
+              className="text-white text-start w-100"
+              style={{paddingLeft:'1rem'}}
               aria-expanded={openManagement}
             >
               Management {openManagement ? "▾" : "▸"}

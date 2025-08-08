@@ -304,7 +304,7 @@ const Header = () => {
               className="form-control rounded-0 rounded-start"
               placeholder="Search products, brands and categories"
             />
-            <button className="btn btn-warning rounded-0 rounded-end">Search</button>
+            <button className="btn bg-primary rounded-0 rounded-end">Search</button>
           </div>
 
           {/* Right: Account, Help, Cart */}
@@ -352,8 +352,8 @@ const Header = () => {
           {/* Categories Nav */}
           <nav className="d-flex gap-3 align-items-center flex-wrap"style={{marginLeft:'40px'}}>
             <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>Home</NavLink>
-            <NavLink to="/calendars" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>Calendars & Gifts</NavLink>
-            <NavLink to="/banners" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>Banners</NavLink>
+            <NavLink to="/services" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>Our services</NavLink>
+            <NavLink to="/products page" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>Our Products</NavLink>
             <NavLink to="/deals" className={({ isActive }) => `nav-link ${isActive ? 'text-hotpink fw-bold' : 'text-dark'}`}>
               Deals <span className="badge bg-danger ms-1">HOT</span>
             </NavLink>
@@ -366,8 +366,8 @@ const Header = () => {
               <div className="small text-muted">CALL US NOW:</div>
               <div className="fw-bold text-pink">0705 783322</div>
             </div>
-            <button className="btn btn-outline-dark text-white fw-semibold"style={{backgroundColor:'black'}} onClick={scrollToExpressForm}>
-              Express Project ?
+            <button className="btn btn-outline-dark text-white fw-semibold"
+            style={{backgroundColor:'black'}} onClick={scrollToExpressForm}><NavLink to='/getQoute'>Express Project ?</NavLink>
             </button>
           </div>
         </div>
@@ -376,7 +376,7 @@ const Header = () => {
       </div>
 
       {/* Offset for fixed header */}
-      <div style={{ paddingTop: '230px' }}></div>
+       <div style={{ paddingTop: '170px' }}></div> 
     </>
   );
 };

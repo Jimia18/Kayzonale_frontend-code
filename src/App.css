@@ -4,6 +4,11 @@
   padding: 0;
   box-sizing: border-box;
 }
+main,
+section {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 html, body {
   height: 100%;

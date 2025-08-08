@@ -46,7 +46,7 @@ const ServicesPage = () => {
   return (
     <>
       {/* Hero Section */}
-      <section style={{ height: '100vh', paddingTop:'0rem', paddingBottom:'0rem' }}>
+      <section>
         <HeroSliderService />
       </section>
 

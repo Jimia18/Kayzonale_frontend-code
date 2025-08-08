@@ -4,7 +4,8 @@ import { Container, Row, Col, Form, Spinner, Pagination, Alert } from 'react-boo
 import ProductCard from '../components/productCard';
 import FilterSidebar from '../components/FilterSideBar';
 import { useCart } from '../components/cartContext'; // if you're using Context for cart
-import Product from '../components/Products'; // static featured products
+// import Product from '../components/Products'; // static featured products
+
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
@@ -23,8 +24,8 @@ const ShopPage = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/v1/products'); // update to match your Flask route
-        setProducts(response.data.products);
+        const response = await axios.get('http://localhost:5000/api/v1/products'); // update to match your Flask route
+        setProducts(response.data);
         setLoading(false);
       } catch (err) {
         setError('Failed to load products');
@@ -69,11 +70,10 @@ const ShopPage = () => {
 
   return (
     <>
-      {/* Featured Static Products Section */}
-      <Product />
+     
 
       {/* All Shop Products from Backend */}
-      <Container fluid className="p-4">
+      <Container fluid className="p-1">
         <h2 className="fw-bold mb-4 text-center mt-5">All Products</h2>
         <Row>
           {/* Filter Sidebar */}
@@ -152,6 +152,7 @@ const ShopPage = () => {
           </Col>
         </Row>
       </Container>
+
     </>
   );
 };

@@ -97,11 +97,11 @@ const DashboardLayout = ({
         style={{ marginLeft: isMobile ? 0 : 250 }}
       >
         <Navbar
-          bg="light"
+          bg="lightblue"
           expand="lg"
-          className="px-3 shadow-sm d-flex justify-content-between"
+          className="px-3 shadow-sm d-flex justify-content-center"
         >
-          <h4 className="my-2">{title}</h4>
+          <h4 className="my-2 fw-bold" style={{fontSize:'2.75rem'}}>{title}</h4>
           {isMobile && (
             <Button
               variant="outline-secondary"
@@ -111,8 +111,8 @@ const DashboardLayout = ({
             </Button>
           )}
         </Navbar>
-        <Container className="py-4">
-          <p className="text-muted">{description}</p>
+        <Container className="py-4 ">
+          <p className="text-center">{description}</p>
           {children}
         </Container>
       </div>

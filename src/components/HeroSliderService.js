@@ -24,13 +24,13 @@ const HeroSliderService = ({ onQuoteClick }) => {
 
   return (
     <section
-      className="w-100 text-white d-flex align-items-center justify-content-center hero-fade"
+      className="bg-dark text-white text-center py-5"
       style={{
         backgroundImage: `url(${images[currentImage].src})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        height: '100vh',
+        
         position: 'relative',
         transition: 'background-image 1s ease-in-out',
         zIndex: 1,
@@ -38,27 +38,27 @@ const HeroSliderService = ({ onQuoteClick }) => {
     >
       {/* Overlay */}
       <div
-        className="position-absolute w-100 h-100"
+        className="position-absolute"
         style={{
           top: 0,
           left: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.37)',
+          background: 'rgba(39, 79, 237, 1)',
           zIndex: 2,
         }}
       ></div>
 
       {/* Content */}
       <div
-        className="position-relative text-white text-center px-3"
-        style={{ zIndex: 3, maxWidth: '900px' }}
+        className="position-relative text-white text-center "
+        style={{ zIndex: 2, maxWidth: '900px', paddingLeft:'15rem' }}
       >
         <h1 className="fw-bold" style={{ fontSize: '4rem' }}>
           {caption}
         </h1>
-        <p style={{ fontSize: '2rem' }} className="text-white mb-1">
+        <p style={{ fontSize: '1.5rem' }} className="text-white ">
           {subCaption1}
         </p>
-        <p style={{ fontSize: '1.5rem' }} className="mb-3 text-white fst-italic">
+        <p style={{ fontSize: '1rem' }} className="text-white fst-italic">
           {subCaption2}
         </p>
        

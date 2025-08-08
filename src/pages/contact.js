@@ -29,7 +29,7 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="contact-page bg-light py-5 pt-5 pb-3 ">
+    <div className="contact-page bg-light ">
       <div className="contact-hero-image"></div>
 
       <section className="py-5 contact-section bg-lightblue rounded shadow">

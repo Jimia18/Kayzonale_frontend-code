@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import api from '../api';
 import AdminSidebar from '../components/AdminSidebar';
 
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     total_orders: 0,
@@ -75,7 +76,7 @@ const AdminDashboard = () => {
 
   return (
     <DashboardLayout
-      title="Admin Dashboard"
+      title="Welcome to the Admin Dashboard"
       description="Track your orders, payments, and stats at a glance."
       sidebarOpen={sidebarOpen}
       setSidebarOpen={setSidebarOpen}

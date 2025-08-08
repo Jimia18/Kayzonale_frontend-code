@@ -1,27 +1,27 @@
-.auth-bg {
+/* .auth-bg {
   background-color: #b2dfdb; /* Soft mint green – change as you like */
-  min-height: 100vh;
+  /* min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
-.auth-form {
+/* .auth-form {
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; */
   /* No outer layer styling */
-}
+/* }
 
 .auth-form input,
 .auth-form button {
   margin-bottom: 1rem;
-}
+} */
 
-.auth-remember {
+/* .auth-remember {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: -0.5rem;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-}
+} */ 

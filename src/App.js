@@ -18,6 +18,7 @@ import ContactPage from './pages/contact';
 import ServicesPage from './pages/services';
 import CartPage from './pages/cart';
 import ShopPage from './pages/shop';
+import Products from './pages/products page';
 
 import ShowUsers from './admin/showUsers';
 import OrderManagement from './admin/orderManagement';
@@ -26,7 +27,7 @@ import ServiceManagement from './admin/serviceManagement';
 import ProjectManagement from './admin/projectManagement';
 import AdminDashboard from './admin/adminDashboard';
 
-
+import { CartProvider } from './components/cartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/header';
 import Footer from './components/footer';
@@ -34,6 +35,13 @@ import FloatingWhatsApp from './components/floatingWhatsap';
 import Login from './components/Login';
 import Register from './components/Register';
 import ProductManagement from './admin/productManagement';
+
+
+        <React.StrictMode>
+  <CartProvider>
+    <App />
+  </CartProvider>
+</React.StrictMode>
 
 const Layout = () => {
   const location = useLocation();
@@ -44,6 +52,7 @@ const Layout = () => {
 
   return (
     <>
+    
       {!hideLayout && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -53,19 +62,20 @@ const Layout = () => {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path='/products page' element={<Products/>}/>
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {/* Protected Admin Routes */}
-        <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<AdminDashboard />}/>
         <Route path="/admin/show-users" element={<ProtectedRoute requiredRole="admin"><ShowUsers /></ProtectedRoute>} />
         <Route path="/admin/clientManagement" element={<ProtectedRoute requiredRole="admin"><ClientManagement /></ProtectedRoute>} />
         <Route path="/admin/orderManagement" element={<ProtectedRoute requiredRole="admin"><OrderManagement /></ProtectedRoute>} />
         <Route path="/admin/serviceManagement" element={<ProtectedRoute requiredRole="admin"><ServiceManagement /></ProtectedRoute>} />
         <Route path="/admin/projectManagement" element={<ProtectedRoute requiredRole="admin"><ProjectManagement /></ProtectedRoute>} />
-        <Route path='/admin/productManagement' element={<ProtectedRoute requiredRole='admin'><ProductManagement/></ProtectedRoute>} />
+        <Route path='/admin/productManagement' element={<ProductManagement/>} />
       </Routes>
 
       {!hideLayout && <FloatingWhatsApp />}
@@ -76,10 +86,12 @@ const Layout = () => {
 
 function App() {
   return (
+    <CartProvider>
     <Router>
       <Layout />
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
+    </CartProvider>
   );
 }
 

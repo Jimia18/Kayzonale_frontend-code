@@ -1,7 +1,14 @@
 .hero-slider-container {
   height: 100vh;
   overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 0;
   
+}
+
+.hero-slider-container {
+  margin: 0 !important;
+  padding: 0 ;
 }
 
 .sidebar {

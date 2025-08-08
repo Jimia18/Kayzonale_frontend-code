@@ -96,19 +96,19 @@ import '../styles/HeroSlider.css'; // Custom styles
 const slides = [
   {
     id: 1,
-    label: 'T-Shirt Printing Branding',
-    image: '/images/Branded t-shirts.jpg',
-    caption: 'Branded T-Shirts',
-    sub: 'We give your t-shirts a professional design',
-    thumbnail: ' /images/Branded t-shirts.jpg',
+    label: 'Bronchures',
+    image: '/images/IMG-20250724-WA0021.jpg',
+    caption: 'Company Bronchures',
+    sub: 'We give your company a professional design',
+    thumbnail: ' /images/IMG-20250724-WA0021.jpg',
   },
   {
     id: 2,
-    label: 'Business Cards',
-    image: '/images/business card.jpg',
-    caption: 'Professional Business Cards',
-    sub: 'Make first impressions last',
-    thumbnail: '/images/business card.jpg',
+    label: 'Cardholders ',
+    image: '/images/IMG-20250724-WA0016.jpg',
+    caption: 'We offer you Durable and high Quality ',
+    sub: 'Make your Company Stand out',
+    thumbnail: '/images/IMG-20250724-WA0016.jpg',
   },
   {
     id: 3,
@@ -122,11 +122,22 @@ const slides = [
   {
     id: 4,
     label: 'Menu Designs',
-    image: '/images/menu.jpg',
+    image: '/images/IMG-20250724-WA0015.jpg',
     caption: 'Creative Menu Designs',
     sub: 'Make your products stand out',
-    thumbnail: '/images/menu.jpg',
+    thumbnail: '/images/IMG-20250724-WA0015.jpg',
   },
+
+  {
+    id: 5,
+    label: 'Wedding Invitation Cards ',
+    image: '/images/IMG-20250724-WA0025.jpg',
+    caption: 'Creative Invitation Designs',
+    sub: 'Make your Wedding stand out',
+    thumbnail: '/images/IMG-20250724-WA0025.jpg',
+  },
+  
+
   // Add more items as needed
 ];  
 
@@ -135,7 +146,7 @@ export default function HeroSlider() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
+      setActiveIndex((next) => (next + 1) % slides.length);
     }, 3000); // Slide every 3 seconds
 
     return () => clearInterval(interval);
@@ -146,7 +157,7 @@ export default function HeroSlider() {
   };
 
   return (
-    <div className="d-flex w-100 hero-slider-container">
+    <div className="d-flex w-100 hero-slider pt-0">
       {/* Sidebar */}
       <div className="sidebar d-flex flex-column p-2">
         {slides.map((slide, index) => (
@@ -184,7 +195,7 @@ export default function HeroSlider() {
               <div className="overlay" />
               <div className="slide-content text-start">
                 <h1 className="fw-bold">{slide.caption}</h1>
-                <p className="lead">{slide.sub}</p>
+                <p className="text-white">{slide.sub}</p>
               </div>
             </div>
           ))}

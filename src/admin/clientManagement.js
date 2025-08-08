@@ -29,7 +29,7 @@ const ClientManagement = () => {
 
   const fetchClients = useCallback(async () => {
     try {
-      const response = await axios.get("/api/v1/clients/", {
+      const response = await axios.get("http://localhost:5000/api/v1/clients/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,7 +51,7 @@ const ClientManagement = () => {
     if (!window.confirm("Are you sure you want to delete this client?")) return;
 
     try {
-      await axios.delete(`/api/v1/clients/${id}`, {
+      await axios.delete(`http://localhost:5000/api/v1/clients/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
