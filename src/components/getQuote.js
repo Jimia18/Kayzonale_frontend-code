@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const GetQuote = ({ show, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,6 +21,15 @@ const GetQuote = ({ show, onClose }) => {
         style={{ maxWidth: '600px', width: '90%' }}
         onClick={(e) => e.stopPropagation()} // PREVENT closing when clicking inside form
       >
+         {/* Logo on top */}
+        <div className="quote-logo">
+          <img
+            src="/images/Kayzonale logo.jpg"
+            alt="Kayzonale Logo"
+            style={{ width: '90px', height: 'auto' }}
+          />
+        </div>
+
         <h4 className="mb-3 text-center">Quotation Request Form</h4>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -33,13 +43,14 @@ const GetQuote = ({ show, onClose }) => {
           </div>
           <div className="mb-3">
             <select className="form-control" required>
-              <option value="">Select Service</option>
-              <option>Print Solutions</option>
-              <option>Stationery Design</option>
+              <select value="">Select Service</select>
+              <option>Business Card design</option>
+              <option>Stationery Services</option>
               <option>Large Format Printing</option>
               <option>Plotting</option>
               <option>Brand Identity Design</option>
               <option>Embroidery</option>
+              <option></option>
             </select>
           </div>
           <div className="mb-3">

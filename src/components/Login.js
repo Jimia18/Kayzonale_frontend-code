@@ -38,13 +38,11 @@ const Login = () => {
 
       toast.success('Login successful!');
 
-      if (user.user_type === 'admin') {
-        navigate('/admin');
-      } else if (user.user_type === 'staff') {
-        navigate('/admin/staff-dashboard');
-      } else {
+      if (user.user_type === 'client') {
         navigate('/');
-      }
+      } else if (user.user_type === 'admin') {
+        navigate('/admin');
+      } 
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || 'Login failed. Check credentials.');

@@ -15,7 +15,14 @@ const FilterSidebar = ({
       value={selectedCategory}
       onChange={(e) => onCategoryChange(e.target.value)}
     >
-      <option value="">All Categories</option>
+      
+      <option value=''>Banners</option>
+      <option  value=''>Poster and flier Design</option>
+      <option  value=''>Tags and Label Design</option>
+      <option  value=''>Calendar Design</option>
+      <option  value=''>Large format prints</option>
+      <option  value=''>Embroidered products</option>
+      <option  value=''>Branding</option>
       {categories.map((cat) => (
         <option key={cat} value={cat}>
           {cat}

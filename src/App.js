@@ -16,7 +16,6 @@ import About from './pages/about';
 import Portfolio from './pages/portfolio';
 import ContactPage from './pages/contact';
 import ServicesPage from './pages/services';
-import CartPage from './pages/cart';
 import ShopPage from './pages/shop';
 import Products from './pages/products page';
 
@@ -57,7 +56,6 @@ const Layout = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
-        <Route path="/cart" element={<CartPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/contact" element={<ContactPage />} />
@@ -69,13 +67,13 @@ const Layout = () => {
         <Route path="/register" element={<Register />} />
 
         {/* Protected Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />}/>
+        <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}/>
         <Route path="/admin/show-users" element={<ProtectedRoute requiredRole="admin"><ShowUsers /></ProtectedRoute>} />
         <Route path="/admin/clientManagement" element={<ProtectedRoute requiredRole="admin"><ClientManagement /></ProtectedRoute>} />
         <Route path="/admin/orderManagement" element={<ProtectedRoute requiredRole="admin"><OrderManagement /></ProtectedRoute>} />
         <Route path="/admin/serviceManagement" element={<ProtectedRoute requiredRole="admin"><ServiceManagement /></ProtectedRoute>} />
         <Route path="/admin/projectManagement" element={<ProtectedRoute requiredRole="admin"><ProjectManagement /></ProtectedRoute>} />
-        <Route path='/admin/productManagement' element={<ProductManagement/>} />
+        <Route path='/admin/productManagement' element={<ProtectedRoute requiredRole='admin'><ProductManagement/></ProtectedRoute>} />
       </Routes>
 
       {!hideLayout && <FloatingWhatsApp />}

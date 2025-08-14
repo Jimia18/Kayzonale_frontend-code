@@ -1,0 +1,14 @@
+/* Prevent body scroll when cart is open */
+.modal-open {
+  overflow: hidden;
+  padding-right: 0 !important;
+}
+
+/* Smooth sidebar transition */
+.cart-sidebar {
+  transition: transform 0.3s ease-out;
+}
+
+.modal-backdrop {
+  transition: opacity 0.3s linear;
+}

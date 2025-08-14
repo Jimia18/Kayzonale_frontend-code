@@ -15,10 +15,8 @@ const ClientManagement = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
 
-  const token =
-    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-  const userType =
-    localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+  const userType = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
 
   useEffect(() => {
     if (!token || (userType !== "admin" && userType !== "staff")) {
@@ -75,6 +73,8 @@ const ClientManagement = () => {
   };
 
   const handleSave = async () => {
+    if (!selectedClient) return;
+    
     try {
       const updatedData = {
         full_name: `${selectedClient.first_name} ${selectedClient.last_name}`,
@@ -84,20 +84,31 @@ const ClientManagement = () => {
         company_name: selectedClient.company_name,
       };
 
-      await axios.put(`/api/v1/clients/${selectedClient.client_id}`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.put(
+        `http://localhost:5000/api/v1/clients/${selectedClient.client_id}`,
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
       toast.success("Client updated successfully");
       setShowModal(false);
       fetchClients();
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update client");
+      console.error("Update error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      toast.error(error.response?.data?.error || "Failed to update client");
     }
   };
 
+  // Properly defined handleChange function
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelectedClient((prev) => ({ ...prev, [name]: value }));

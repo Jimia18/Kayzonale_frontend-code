@@ -1,0 +1,10 @@
+.hero-section {
+  background-image: url('/public/images/cardholders.jpg'); /* Replace with your actual image */
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+
+}

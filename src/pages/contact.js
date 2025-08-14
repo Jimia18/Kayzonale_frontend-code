@@ -79,15 +79,17 @@ const ContactPage = () => {
                 onChange={handleChange}
                 required
               />
-              <input
-                type="text"
-                name="service"
-                placeholder="SERVICE NEEDED"
-                className="form-control mb-3"
-                value={formData.service}
-                onChange={handleChange}
-                required
-              />
+              <div className="mb-3">
+            <select className="form-control" required>
+              <option value="" className='fw-bold'>Service Needed</option>
+              <option>Print Solutions</option>
+              <option>Stationery Design</option>
+              <option>Large Format Printing</option>
+              <option>Plotting</option>
+              <option>Brand Identity Design</option>
+              <option>Embroidery</option>
+            </select>
+          </div>
               <textarea
                 name="message"
                 rows="4"

@@ -71,3 +71,19 @@ body,
 .slide-fade-in {
   animation: slideFadeIn 1s ease forwards;
 }
+
+/* Prevent body scroll when cart is open */
+body.modal-open {
+  overflow: hidden;
+  padding-right: 0 !important;
+}
+
+/* Smooth transitions */
+.cart-sidebar {
+  transition: transform 0.3s ease-out !important;
+}
+
+/* Overlay animation */
+.cart-overlay {
+  transition: opacity 0.3s ease;
+}
