@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/home.css';
 import GetQuote from '../components/getQuote';
-import HeroSlider from '../components/HeroSlider';
+import HeroSliderhome from '../components/Herosliderhome';
 // import Product from '../components/Products';
 import Testimonials from '../components/testimonials';
 
@@ -12,7 +12,7 @@ const HomePage = () => {
     <div className="text-gray-800 font-sans">
 
       {/* Hero Section */}
-      <HeroSlider onQuoteClick={() => setShowQuoteForm(true)} />
+      <HeroSliderhome onQuoteClick={() => setShowQuoteForm(true)} />
 
       {/* Featured Products Section */}
       {/* <Product  /> */}

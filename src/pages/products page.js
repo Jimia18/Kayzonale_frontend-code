@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, Tab, Container, Row, Col, Card, Button } from 'react-bootstrap';
 import  '../styles/products page.css';
+import HeroSlider from '../components/HeroSlider';
 
 interface Product {
   id: number;
@@ -142,15 +143,12 @@ const Products: React.FC = () => {
       description: "Wide-format printing for signage and events."
     }
   };
+  
 
   return (
     <div className="products-page">
-      <section className="hero-section text-dark text-center py-5">
-        <Container>
-          <h1 className="display-4 fw-bold mb-3">Our Products</h1>
-          <p className="lead">Select a category below to view our offerings.</p>
-        </Container>
-      </section>
+      <HeroSlider/>
+      
 
       <Container className="my-5">
         <Tabs 
