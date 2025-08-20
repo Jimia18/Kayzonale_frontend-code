@@ -2,20 +2,22 @@ import React, { useState } from 'react';
 import '../styles/home.css';
 import GetQuote from '../components/getQuote';
 import HeroSliderhome from '../components/Herosliderhome';
-// import Product from '../components/Products';
+//import FeaturedProducts from '../components/FeaturedProducts';
 import Testimonials from '../components/testimonials';
+import FeaturedProducts from '../components/FeaturedProducts';
 
 const HomePage = () => {
   const [showQuoteForm, setShowQuoteForm] = useState(false);
 
   return (
-    <div className="text-gray-800 font-sans">
+    <div className="text-gray-800 font-sans ">
+        <main className="flex-grow-1">
 
       {/* Hero Section */}
       <HeroSliderhome onQuoteClick={() => setShowQuoteForm(true)} />
 
       {/* Featured Products Section */}
-      {/* <Product  /> */}
+      <FeaturedProducts/>
 
       {/* About Section
       <section className="py-5 bg-info bg-opacity-25 text-dark pt-5 pb-3">
@@ -49,7 +51,7 @@ const HomePage = () => {
       </section> */}
 
       {/* Interactive Service Highlight Section */}
-<section className="position-relative overflow-hidden py-5 text-dark rounded-shadow " 
+<section className="position-relative overflow-hidden py-1 text-dark rounded-shadow " 
 style={{ background: 'linear-gradient(-45deg, #6faaddff, #ae7588aa, #b6ecefff, #b1aea9ff)', backgroundSize: '400% 400%', animation: 'gradientBG 15s ease infinite' }}>
   <div className="container">
     <div className="row align-items-center">
@@ -156,7 +158,9 @@ style={{ background: 'linear-gradient(-45deg, #6faaddff, #ae7588aa, #b6ecefff, #
 
 </section>
 
-<Testimonials />
+<section className="py-5 mb-5">
+        <Testimonials />
+</section>
 
       {/* Portfolio Section */}
       {/* <section className="text-white text-center portfolio-intro d-flex align-items-center" style={{ height: '300px', position: 'relative' }}>
@@ -203,13 +207,14 @@ style={{ background: 'linear-gradient(-45deg, #6faaddff, #ae7588aa, #b6ecefff, #
       </section> */}
 
       {/* Quote Section */}
-      <section className="py-5 text-center fst-italic ">
+      <section className="py-5 text-center fst-italic">
         <h4 className="fw-bold">
           <span className="text-primary">QUALITY</span>{' '}
           <span>PRINT AND DESIGN MADE</span>{' '}
           <span className="text-danger">AFFORDABLE</span>
         </h4>
       </section>
+      </main>
 
       {/* GetQuote Modal */}
       <GetQuote show={showQuoteForm} onClose={() => setShowQuoteForm(false)} />

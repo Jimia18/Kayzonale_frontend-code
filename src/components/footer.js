@@ -82,7 +82,7 @@ import {
   faTwitter,
   faInstagram,
   faYoutube,
-  faPinterest,
+  faTiktok,
 } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
@@ -96,7 +96,7 @@ const Footer = () => {
           { href: 'https://twitter.com', icon: faTwitter, label: 'Twitter' },
           { href: 'https://instagram.com', icon: faInstagram, label: 'Instagram' },
           { href: 'https://youtube.com', icon: faYoutube, label: 'YouTube' },
-          { href: 'https://pinterest.com', icon: faPinterest, label: 'Pinterest' },
+          { href: 'https://tiktok.com', icon: faTiktok, label: 'Tiktok' },
         ].map(({ href, icon, label }) => (
           <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="social-link hover-toggle">
             <span className="text">{label}</span>
@@ -172,12 +172,15 @@ const Footer = () => {
       </div>
 
       {/* Divider */}
-      <hr className="my-4" />
+      <hr className="my-0" />
 
       {/* Footer Bottom */}
-      <div className="text-center small-text mb-2">
+      <div className="text-center small-text">
         <small>&copy; {new Date().getFullYear()} Kayzonale Designs and Enterprises</small>
       </div>
+
+      
+     
 
   
     </footer>

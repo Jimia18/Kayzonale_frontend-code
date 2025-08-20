@@ -1,225 +1,281 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Table, Button, Spinner, Modal, Form } from "react-bootstrap";
+import DashboardLayout from "./dashboardLayout";
+import AdminSidebar from "../components/AdminSidebar";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const ShowUsers = () => {
+const UsersPage = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    contact: '',
-    user_type: ''
-  });
-  const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const isMobile = window.innerWidth <= 768;
 
-  const fetchUsers = async () => {
+  const token =
+    localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+  const userType =
+    localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+
+  useEffect(() => {
+    if (!token || userType !== "admin") {
+      toast.error("Access denied. Only admins can access this page.");
+      navigate("/");
+    }
+  }, [token, userType, navigate]);
+
+  const fetchUsers = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/v1/users', {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get("http://localhost:5000/api/v1/users/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setUsers(response.data.users);
+
+      setUsers(response.data.users || []);
     } catch (error) {
-      console.error('Failed to fetch users:', error.response?.data || error.message);
+      console.error("Error fetching users:", error.response || error.message);
+      toast.error("Failed to fetch users");
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (token && userType === "admin") {
+      fetchUsers();
+    }
+  }, [fetchUsers, token, userType]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/v1/users/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+
+      await axios.delete(`http://localhost:5000/api/v1/users/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setUsers(users.filter(user => user.id !== id));
-    } catch (error) {
-      console.error('Delete failed:', error.response?.data || error.message);
-    }
-  };
 
-  const handleEditClick = (user) => {
-    setEditingUser(user.id);
-    setEditForm({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      contact: user.contact,
-      user_type: user.type
-    });
-  };
-
-  const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
-
-  const handleEditSubmit = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.patch(`/api/v1/users/edit/${editingUser}`, editForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setEditingUser(null);
+      toast.success("User deleted successfully");
+    } catch (err) {
+      console.error("❌ Delete error:", err);
       fetchUsers();
-    } catch (error) {
-      console.error('Update failed:', error.response?.data || error.message);
+
+      if (err.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+      } else {
+        toast.error(err.response?.data?.error || "Failed to delete user");
+      }
     }
   };
 
-  // Pagination
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const filteredUsers = users.filter(user =>
-    user.first_name.toLowerCase().includes(search.toLowerCase()) ||
-    user.last_name.toLowerCase().includes(search.toLowerCase()) ||
-    user.email.toLowerCase().includes(search.toLowerCase())
-  );
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const openEditModal = (user) => {
+    setEditUser(user);
+    setShowEditModal(true);
+  };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-semibold mb-4">All Users</h2>
-
-      <input
-        type="text"
-        placeholder="Search by name or email"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="border px-3 py-1 mb-4 w-full max-w-sm"
-      />
-
+    <DashboardLayout
+      title="Users"
+      description="Manage all registered Users"
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      isMobile={isMobile}
+      SidebarComponent={AdminSidebar}
+    >
       {loading ? (
-        <p>Loading users...</p>
+        <div className="text-center my-5">
+          <Spinner animation="border" variant="primary" />
+        </div>
       ) : (
         <>
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-200">
+          <Table striped bordered hover responsive>
+            <thead>
               <tr>
-                <th className="border px-4 py-2">ID</th>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Email</th>
-                <th className="border px-4 py-2">Contact</th>
-                <th className="border px-4 py-2">Type</th>
-                <th className="border px-4 py-2">Actions</th>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Type</th>
+                <th>Created At</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {currentUsers.map(user => (
-                <tr key={user.id}>
-                  <td className="border px-4 py-2">{user.id}</td>
-                  <td className="border px-4 py-2">
-                    {editingUser === user.id ? (
-                      <>
-                        <input
-                          name="first_name"
-                          value={editForm.first_name}
-                          onChange={handleEditChange}
-                          className="border p-1 w-24"
-                        />
-                        <input
-                          name="last_name"
-                          value={editForm.last_name}
-                          onChange={handleEditChange}
-                          className="border p-1 w-24 ml-1"
-                        />
-                      </>
-                    ) : (
-                      `${user.first_name} ${user.last_name}`
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {editingUser === user.id ? (
-                      <input
-                        name="email"
-                        value={editForm.email}
-                        onChange={handleEditChange}
-                        className="border p-1 w-40"
-                      />
-                    ) : (
-                      user.email
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {editingUser === user.id ? (
-                      <input
-                        name="contact"
-                        value={editForm.contact}
-                        onChange={handleEditChange}
-                        className="border p-1 w-32"
-                      />
-                    ) : (
-                      user.contact
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {editingUser === user.id ? (
-                      <select
-                        name="user_type"
-                        value={editForm.user_type}
-                        onChange={handleEditChange}
-                        className="border p-1"
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.first_name}</td>
+                    <td>{user.last_name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.contact}</td>
+                    <td>{user.type}</td>
+                    <td>{new Date(user.created_at).toLocaleString()}</td>
+                    <td>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => openEditModal(user)}
                       >
-                        <option value="staff">Staff</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    ) : (
-                      user.type
-                    )}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {editingUser === user.id ? (
-                      <>
-                        <button onClick={handleEditSubmit} className="text-green-600 hover:underline mr-2">
-                          Save
-                        </button>
-                        <button onClick={() => setEditingUser(null)} className="text-gray-600 hover:underline">
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:underline mr-2">
-                          Edit
-                        </button>
-                        <button onClick={() => handleDelete(user.id)} className="text-red-600 hover:underline">
-                          Delete
-                        </button>
-                      </>
-                    )}
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center">
+                    No users found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
-          </table>
+          </Table>
 
-          {/* Pagination controls */}
-          <div className="mt-4 flex justify-center gap-2">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 py-1 border rounded ${
-                  currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white'
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
+          {/* Edit User Modal */}
+          {editUser && (
+            <EditUserModal
+              user={editUser}
+              show={showEditModal}
+              onHide={() => setShowEditModal(false)}
+              onUpdate={fetchUsers}
+              token={token}
+            />
+          )}
         </>
       )}
-    </div>
+    </DashboardLayout>
   );
 };
 
-export default ShowUsers;
+export default UsersPage;
+
+// ---------------- EditUserModal Component ----------------
+
+const EditUserModal = ({ user, show, onHide, onUpdate, token }) => {
+  const [formData, setFormData] = useState({
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: user.email,
+    contact: user.contact,
+    user_type: user.type,
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `http://localhost:5000/api/v1/users/edit/${user.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("User updated successfully");
+      onHide();
+      onUpdate(); // refresh user list
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error(error.response?.data?.error || "Failed to update user");
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={onHide} centered>
+      <Form onSubmit={handleSubmit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="firstName" className="mb-2">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="lastName" className="mb-2">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="email" className="mb-2">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="contact" className="mb-2">
+            <Form.Label>Contact</Form.Label>
+            <Form.Control
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="user_type" className="mb-2">
+            <Form.Label>User Type</Form.Label>
+            <Form.Select
+              name="user_type"
+              value={formData.user_type}
+              onChange={handleChange}
+            >
+              <option value="admin">Admin</option>
+              <option value="client">Client</option>
+              <option  value= "staff">Staff</option>
+            </Form.Select>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit">
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  );
+};

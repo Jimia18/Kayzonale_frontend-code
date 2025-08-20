@@ -1,12 +1,76 @@
-.featured-section h2.heading-underline::after {
-  content: '';
-  display: block;
-  height: 5px;
-  background: linear-gradient(to right, #a6e3a1, #fff);
-  width: 60%;
-  margin: 0.5rem auto 0;
+/* Featured Products card hover effect */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.product-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
 }
 
-.text-pink {
-  color: #e5007d;
+/* Category buttons */
+.btn-outline-primary {
+  border-width: 2px;
+  transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+/* View All button */
+.btn-outline-primary.btn-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  border-width: 2px;
+  transition: all 0.3s ease;
+}
+.btn-outline-primary.btn-lg:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+/* Heading Style */
+.featured-heading {
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+}
+.featured-heading .text-primary {
+  color: #e6007e;
+}
+.featured-heading::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: #e6007e;
+  margin: 8px auto 0;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.featured-heading:hover::after {
+  width: 70px;
+}
+
+/* Transition for product cards */
+.product-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.product-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 300ms ease-in-out;
+}
+.product-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.product-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 300ms ease-in-out;
 }

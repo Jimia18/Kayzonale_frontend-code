@@ -1,266 +1,327 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { useParams, useNavigate } from 'react-router-dom';
-import DashboardLayout from './dashboardLayout';
-import AdminSidebar from '../components/AdminSidebar';
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 
-const ProductForm = () => {
-  const { productId } = useParams();
-  const navigate = useNavigate();
-  const imageInputRef = useRef(null); // Create ref for file input
-  const [isLoading, setIsLoading] = useState(false);
+const ProductManagement = () => {
+  const [products, setProducts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    category: '',
+    title: "",
+    description: "",
+    category: "",
+    price: "",
+    image: null,
   });
-  const [imagePreview, setImagePreview] = useState('');
-  const [existingImage, setExistingImage] = useState('');
-  const [imageFile, setImageFile] = useState(null); // Store the actual file object
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch product if in edit mode
-  useEffect(() => {
-    if (!productId) return;
+  const API_BASE = "http://localhost:5000/api/v1/products";
 
-    const fetchProduct = async () => {
-      try {
-        setIsLoading(true);
-        const { data } = await axios.get(`http://localhost:5000/api/v1/products/${productId}`);
-        setFormData({
-          title: data.title,
-          description: data.description,
-          price: data.price.toString(),
-          category: data.category,
-        });
-        if (data.image) {
-          setExistingImage(`http://localhost:5000${data.image}`);
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.error || 'Failed to load product');
-      } finally {
-        setIsLoading(false);
+  // Get token from localStorage
+  const token = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")).access_token
+    : null;
+
+  // Fetch all products
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/`);
+      const data = await res.json();
+      if (data.success) {
+        setProducts(data.data.products || []);
+      } else {
+        setError("Failed to load products");
       }
-    };
+    } catch (err) {
+      setError("Error fetching products");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProduct();
-  }, [productId]);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
+  // Handle form input changes
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setFormData((prev) => ({ ...prev, image: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate image type and size
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      toast.error('Invalid image type. Please upload JPEG, PNG, GIF, or WEBP');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
-      return;
-    }
-
-    // Create preview and store file
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-    setImageFile(file); // Store the file object
+  // Open modal for creating a new product
+  const openCreateModal = () => {
+    setEditingProduct(null);
+    setFormData({
+      title: "",
+      description: "",
+      category: "",
+      price: "",
+      image: null,
+    });
+    setError(null);
+    setSuccess(null);
+    setShowModal(true);
   };
 
+  // Open modal for editing an existing product
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setFormData({
+      title: product.title || "",
+      description: product.description || "",
+      category: product.category || "",
+      price: product.price !== null && product.price !== undefined ? product.price.toString() : "",
+      image: null,
+    });
+    setError(null);
+    setSuccess(null);
+    setShowModal(true);
+  };
+
+  // Submit form handler for create/update
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate form
-    if (!formData.title || !formData.description || !formData.category || !formData.price) {
-      return toast.error('All fields are required');
+  e.preventDefault();
+  setError(null);
+  setSuccess(null);
+
+  // Validation (unchanged)
+  if (!formData.title.trim() || !formData.description.trim() || !formData.category.trim()) {
+    setError("Title, description, and category are required.");
+    return;
+  }
+
+  // Prepare FormData
+  const formPayload = new FormData();
+  formPayload.append("title", formData.title.trim());
+  formPayload.append("description", formData.description.trim());
+  formPayload.append("category", formData.category.trim());
+  formPayload.append("price", formData.price || "");
+  if (formData.image) {
+    formPayload.append("image", formData.image);
+  }
+
+  try {
+    const url = editingProduct
+      ? `${API_BASE}/edit/${editingProduct.id}`
+      : `${API_BASE}/create`;
+    const method = editingProduct ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formPayload,
+    });
+
+    // Parse response safely
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseError) {
+      console.error("Failed to parse JSON response:", parseError);
+      setError("Received invalid response from server");
+      return;
     }
 
-    if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
-      return toast.error('Price must be a positive number');
+    // Handle non-2xx responses
+    if (!res.ok) {
+      // Extract detailed error message
+      let errorMessage = "Failed to save product";
+      
+      if (data.error) {
+        errorMessage = data.error;
+      }
+      
+      if (data.details) {
+        // Format validation errors
+        const detailMessages = Object.entries(data.details)
+          .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
+          .join('; ');
+        errorMessage += ` - ${detailMessages}`;
+      }
+      
+      setError(errorMessage);
+    } else {
+      // Success handling
+      setSuccess(editingProduct ? "Product updated successfully." : "Product created successfully.");
+      setShowModal(false);
+      fetchProducts();
     }
-
-    setIsLoading(true);
+  } catch (err) {
+    console.error("Network error:", err);
+    setError("Network error. Please check your connection and try again.");
+  }
+};
+  // Delete product handler
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const formPayload = new FormData();
-      
-      // Append form data
-      Object.entries(formData).forEach(([key, value]) => {
-        formPayload.append(key, value);
-      });
-
-      // Append image if it exists
-      if (imageFile) {
-        formPayload.append('image', imageFile);
-      }
-
-      const config = {
+      const res = await fetch(`${API_BASE}/delete/${id}`, {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
-      };
+      });
+      const data = await res.json();
 
-      if (productId) {
-        // Update product - CORRECT ENDPOINT
-        await axios.put(
-          `http://localhost:5000/api/v1/products/${productId}`, 
-          formPayload, 
-          config
-        );
-        toast.success('Product updated successfully');
+      if (!res.ok) {
+        setError(data.error || "Failed to delete product.");
       } else {
-        // Create product - CORRECT ENDPOINT (removed /create)
-        await axios.post(
-          'http://localhost:5000/api/v1/products/', 
-          formPayload, 
-          config
-        );
-        toast.success('Product created successfully');
+        setSuccess("Product deleted successfully.");
+        fetchProducts();
       }
-
-      navigate('/admin/products');
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Operation failed';
-      toast.error(errorMessage);
-      console.error('API Error:', error);
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      setError("An error occurred while deleting the product.");
     }
   };
 
   return (
-    <DashboardLayout
-      title={productId ? 'Edit Product' : 'Add Product'}
-      SidebarComponent={AdminSidebar}
-    >
-      <div className="container py-4">
-        <div className="card shadow">
-          <div className="card-body">
-            <h2 className="mb-4">{productId ? 'Edit Product' : 'Add New Product'}</h2>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Title*</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="form-control"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+    <div className="container my-4">
+      <h1>Product Management</h1>
 
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Category*</label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="form-control"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Price*</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    className="form-control"
-                    min="0.01"
-                    step="0.01"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
+      <Button variant="primary" className="mb-3" onClick={openCreateModal}>
+        Add New Product
+      </Button>
 
-              <div className="mb-3">
-                <label className="form-label">Description*</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="form-control"
-                  rows="4"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
 
-              <div className="mb-4">
-                <label className="form-label">Product Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="form-control"
-                  disabled={isLoading}
-                  ref={imageInputRef}  // Add ref to input
+      {loading ? (
+        <p>Loading products...</p>
+      ) : (
+        <div className="row">
+          {products.length === 0 && <p>No products found.</p>}
+          {products.map((product) => (
+            <div key={product.id} className="col-md-4 mb-4">
+              <div className="card h-100 shadow-sm">
+                <img
+                  src={
+                    product.image
+                      ? `http://localhost:5000/static/uploads/products/${product.image}`
+                      : "/images/business card.jpg"
+                  }
+                  alt={product.title}
+                  className="card-img-top"
+                  style={{ objectFit: "cover", height: "200px" }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/images/business card.jpg";
+                  }}
                 />
-                <div className="mt-2">
-                  {(imagePreview || existingImage) && (
-                    <img 
-                      src={imagePreview || existingImage} 
-                      alt="Product preview" 
-                      className="img-thumbnail" 
-                      style={{ maxHeight: '200px' }}
-                    />
-                  )}
-                  <small className="text-muted d-block mt-1">
-                    {imagePreview ? 'New image selected' : existingImage ? 'Current product image' : 'No image selected'}
-                  </small>
+                <div className="card-body">
+                  <h5 className="card-title">{product.title}</h5>
+                  <p>{product.description}</p>
+                  <p>Category: {product.category}</p>
+                  <p>Price: {product.price ?? "N/A"}</p>
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => openEditModal(product)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDeleteProduct(product.id)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
-
-              <div className="d-flex justify-content-end gap-2">
-                <button 
-                  type="button" 
-                  className="btn btn-outline-secondary"
-                  onClick={() => navigate('/pages/products page')}  // 
-                  disabled={isLoading}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-                      {productId ? 'Saving...' : 'Creating...'}
-                    </>
-                  ) : (
-                    productId ? 'Save Changes' : 'Create Product'
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </DashboardLayout>
+      )}
+
+      {/* Modal for Create/Edit */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{editingProduct ? "Edit Product" : "Create Product"}</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSubmit} encType="multipart/form-data">
+          <Modal.Body>
+            {error && <Alert variant="danger">{error}</Alert>}
+
+            <Form.Group className="mb-3" controlId="formTitle">
+              <Form.Label>Title *</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formDescription">
+              <Form.Label>Description *</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formCategory">
+              <Form.Label>Category *</Form.Label>
+              <Form.Control
+                type="text"
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                required
+                
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formPrice">
+              <Form.Label>Price</Form.Label>
+              <Form.Control
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleInputChange}
+                min="0"
+                step="1"
+              />
+            </Form.Group>
+
+            <Form.Group controlId="formImage" className="mb-3">
+              <Form.Label>Image {editingProduct ? "(leave empty to keep current)" : "*"}</Form.Label>
+              <Form.Control
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit" disabled={loading}>
+              {editingProduct ? "Update Product" : "Create Product"}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    </div>
   );
 };
 
-export default ProductForm;
+export default ProductManagement;

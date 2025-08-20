@@ -55,7 +55,7 @@ const Testimonials = () => {
   );
 
   return (
-    <div className="testimonials-page py-5 text-center position-relative">
+    <div className="testimonials-page py-2 text-center position-relative">
       <h3 className="subheading text-muted">HAPPY CUSTOMERS</h3>
       <h1 className="main-heading mb-4">
         What People <span className="text-primary">Are Saying</span>

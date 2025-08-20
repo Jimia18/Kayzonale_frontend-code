@@ -218,7 +218,7 @@ const AdminSidebar = ({ show, onHide, isMobile }) => {
           </Nav.Item>
 
           <Nav.Item>
-            <NavLink to="/admin/show-users" className="nav-link text-white" onClick={onHide}>
+            <NavLink to="/admin/showUsers" className="nav-link text-white" onClick={onHide}>
               Show Users
             </NavLink>
           </Nav.Item>

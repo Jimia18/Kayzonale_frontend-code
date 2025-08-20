@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/HeroSlider.css'; // Ensure .hero-fade CSS has fade animation
+import '../styles/HeroSlider.css';
 
 const HeroSlider = ({ onQuoteClick }) => {
   const images = [
@@ -24,11 +24,19 @@ const HeroSlider = ({ onQuoteClick }) => {
   ];
 
   const [currentImage, setCurrentImage] = useState(0);
+  const [animateText, setAnimateText] = useState('slide-in');
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 3000); // change image every 3 seconds for better readability
+      // Start sliding out
+      setAnimateText('slide-out');
+
+      setTimeout(() => {
+        // Switch to next image and slide in
+        setCurrentImage((prev) => (prev + 1) % images.length);
+        setAnimateText('slide-in');
+      }, 1000); // match animation duration
+    }, 4000); // change every 4 seconds
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -37,48 +45,45 @@ const HeroSlider = ({ onQuoteClick }) => {
 
   return (
     <section
-      aria-label="Hero image slider"
-      className="w-100 text-white d-flex align-items-center justify-content-center hero-fade pt-2"
       style={{
         backgroundImage: `url(${current.src})`,
         backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        height: '18%',
+        height: '60vh',
         position: 'relative',
         transition: 'background-image 1s ease-in-out',
-        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       {/* Overlay */}
       <div
-        className="position-absolute w-100 h-100"
         style={{
+          position: 'absolute',
           top: 0,
           left: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.37)',
-          zIndex: 2,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.37)',
         }}
       />
 
-      {/* Content */}
-      <div
-        className="position-relative text-white text-center px-3"
-        style={{ zIndex: 3, maxWidth: '900px' }}
-      >
-        <h1 className="fw-bold" style={{ fontSize: '4rem' }}>
+      {/* Text content */}
+      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', color: 'white', maxWidth: '900px', padding: '0 1rem' }}>
+        <h1 className={`hero-text ${animateText}`} style={{ fontSize: '4rem', fontWeight: 'bold' }}>
           {current.caption}
         </h1>
-        <p style={{ fontSize: '2rem' }} className="mb-1 text-white">
+        <p className={`hero-text ${animateText}`} style={{ fontSize: '2rem',color: 'white', margin: '0.5rem 0' }}>
           {current.subCaption1}
         </p>
-        <p style={{ fontSize: '1.5rem' }} className="mb-3 fst-italic text-white">
+        <p className={`hero-text ${animateText}`} style={{ fontSize: '1.5rem',color: 'white', fontStyle: 'italic', marginBottom: '1rem' }}>
           {current.subCaption2}
         </p>
         <button
+          className={`hero-text btn btn-danger rounded-pill hero-text ${animateText}`}
           onClick={onQuoteClick}
-          className="btn btn-danger rounded-pill fw-bold"
-          style={{ fontSize: '1.5rem', padding: '1rem 3rem' }}
+          style={{ fontSize: '1.5rem', padding: '1rem 3rem', borderRadius: '50px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
         >
           Get a Quote
         </button>
