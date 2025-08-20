@@ -80,13 +80,13 @@ const HeroSlider = ({ onQuoteClick }) => {
         <p className={`hero-text ${animateText}`} style={{ fontSize: '1.5rem',color: 'white', fontStyle: 'italic', marginBottom: '1rem' }}>
           {current.subCaption2}
         </p>
-        <button
+        {/* <button
           className={`hero-text btn btn-danger rounded-pill hero-text ${animateText}`}
           onClick={onQuoteClick}
           style={{ fontSize: '1.5rem', padding: '1rem 3rem', borderRadius: '50px', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
         >
           Get a Quote
-        </button>
+        </button> */}
       </div>
     </section>
   );
