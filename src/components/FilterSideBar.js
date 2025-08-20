@@ -1,6 +1,4 @@
-// src/components/FilterSidebar.jsx
 import React from "react";
-import { Form } from "react-bootstrap";
 
 const FilterSidebar = ({
   categories,
@@ -8,38 +6,36 @@ const FilterSidebar = ({
   onCategoryChange,
   priceRange,
   onPriceChange,
-}) => (
-  <div>
-    <h5>Category</h5>
-    <Form.Select
-      value={selectedCategory}
-      onChange={(e) => onCategoryChange(e.target.value)}
-    >
-      
-      <option value=''>Banners</option>
-      <option  value=''>Poster and flier Design</option>
-      <option  value=''>Tags and Label Design</option>
-      <option  value=''>Calendar Design</option>
-      <option  value=''>Large format prints</option>
-      <option  value=''>Embroidered products</option>
-      <option  value=''>Branding</option>
-      {categories.map((cat) => (
-        <option key={cat} value={cat}>
-          {cat}
-        </option>
-      ))}
-    </Form.Select>
+}) => {
+  return (
+    <div className="filter-sidebar p-3">
+      <h5 className="mb-3">Categories</h5>
+      <select
+        className="form-select mb-4"
+        value={selectedCategory}
+        onChange={(e) => onCategoryChange(e.target.value)}
+      >
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+      </select>
 
-    <h5 className="mt-4">Price Range</h5>
-    <Form.Range
-      min={0}
-      max={100000}
-      step={500}
-      value={priceRange}
-      onChange={(e) => onPriceChange(Number(e.target.value))}
-    />
-    <div>Max: UGX {priceRange.toLocaleString()}</div>
-  </div>
-);
+      {/* Price Filter Example */}
+      <div className="mt-4">
+        <h6>Price Range</h6>
+        <input
+          type="range"
+          min={0}
+          max={1000000}
+          value={priceRange[1]}
+          onChange={(e) => onPriceChange([priceRange[0], Number(e.target.value)])}
+        />
+        <div>Max: UGX {priceRange[1].toLocaleString()}</div>
+      </div>
+    </div>
+  );
+};
 
 export default FilterSidebar;

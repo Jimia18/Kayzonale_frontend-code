@@ -7,7 +7,7 @@ import { useCart } from '../components/cartContext';
 const Header = () => {
   const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { cartItems } = useCart(); // get cartItems from context
+  const { cartItems } = useCart();
 
   const totalItems = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
 
@@ -15,6 +15,7 @@ const Header = () => {
     <>
       {/* Fixed Header */}
       <div style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1030, backgroundColor: '#fff' }}>
+        
         {/* Top Strip */}
         <div className="bg-dark text-white py-2">
           <div className="container d-flex justify-content-center align-items-center gap-3 flex-wrap">
@@ -37,7 +38,11 @@ const Header = () => {
 
           {/* Center: Search Bar */}
           <div className="flex-grow-1 d-flex">
-            <input type="text" className="form-control rounded-0 rounded-start" placeholder="Search products, brands and categories" />
+            <input
+              type="text"
+              className="form-control rounded-0 rounded-start"
+              placeholder="Search products, brands and categories"
+            />
             <button className="btn bg-primary text-white rounded-0 rounded-end">Search</button>
           </div>
 
@@ -69,7 +74,7 @@ const Header = () => {
             </div>
 
             {/* Cart Button */}
-            <button 
+            <button
               className="btn btn-light position-relative"
               onClick={() => setIsCartOpen(true)}
             >
@@ -116,8 +121,8 @@ const Header = () => {
       <GetQuote show={showQuoteForm} onClose={() => setShowQuoteForm(false)} />
 
       {/* Cart Sidebar */}
-      <CartSidebar 
-        isOpen={isCartOpen} 
+      <CartSidebar
+        isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
       />
     </>

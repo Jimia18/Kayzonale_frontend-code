@@ -38,8 +38,10 @@ import Login from './components/Login';
 import Register from './components/Register';
 
 // Checkout & Payments
-import CheckoutPage from './pages/checkoutPage';
-import PaymentPage from './pages/Payments';
+import CartPage from './pages/cartPage';
+import CheckoutPaymentsPage from './pages/CheckoutPaymentsPage'
+import ThankYouPage from './pages/ThankYou'
+import FaqsPage from './pages/faq';
 
 const Layout = () => {
   const location = useLocation();
@@ -62,8 +64,12 @@ const Layout = () => {
         <Route path="/products" element={<Products />} />
 
         {/* Cart Flow */}
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
+        <Route path='/cartPage' element={<CartPage/>}/>
+        <Route path="/CheckoutPaymentsPage" element={<CheckoutPaymentsPage />} />
+        <Route path='/ThankYou' element={<ThankYouPage/>}/>
+
+        {/*Faqs*/}
+        <Route path='/faq' element = {<FaqsPage/>}/>
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />

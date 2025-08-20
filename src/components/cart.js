@@ -30,7 +30,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
   const handleProceedToCheckout = () => {
     // No login required — go straight to checkout
-    navigate("/checkout");
+    navigate("/CheckoutPaymentsPage");
+    onClose();
   };
 
   return (
@@ -127,6 +128,17 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <h5>Total:</h5>
                 <h5>UGX {getTotal().toLocaleString()}</h5>
               </div>
+               {/* View Cart Button */}
+              <button
+                onClick={() => {
+                  navigate("/cartPage"); // Navigate to full cart page
+                  onClose(); // Close sidebar
+                }}
+                className="btn btn-info w-100 mb-2"
+              >
+                View Full Cart
+              </button>
+              {/* Proceed to Checkout */}
               <button
                 onClick={handleProceedToCheckout}
                 className="btn btn-primary w-100"

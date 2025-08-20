@@ -30,12 +30,21 @@ const ShopPage = () => {
   const productsPerPage = 9;
   const { addToCart } = useCart();
 
+  // Fixed categories list
+  const categories = [
+    "All",
+    "Large Format Printing",
+    "Printing & Embroidery",
+    "Branding & Stationery",
+    "Paper & Promotional Products",
+    "Specialty & Seasonal",
+  ];
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const res = await api.get("/products/");
-        // Defensive: Expect response data to have data property with products array
         const fetchedProducts =
           Array.isArray(res.data)
             ? res.data
@@ -98,11 +107,6 @@ const ShopPage = () => {
   );
 
   const handleAddToCart = (product) => addToCart(product);
-
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))],
-    [products]
-  );
 
   return (
     <Container fluid className="p-1">
