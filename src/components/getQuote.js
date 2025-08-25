@@ -1,83 +1,150 @@
-import React from 'react';
+import React, { useState } from "react";
+import emailjs from "emailjs-com";
 
+const RequestQuote = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    service: "",
+    message: "",
+  });
 
-const GetQuote = ({ show, onClose }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Quote request submitted!');
-    onClose(); // close the modal
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (!show) return null;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setStatus("Sending...");
+
+    emailjs
+      .send(
+        "your_service_id", // Replace with your EmailJS service ID
+        "your_template_id", // Replace with your EmailJS template ID
+        formData,
+        "your_public_key" // Replace with your EmailJS public key
+      )
+      .then(
+        () => {
+          setStatus("✅ Quote request sent successfully!");
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            service: "",
+            message: "",
+          });
+        },
+        (error) => {
+          setStatus("❌ Failed to send. Please try again.");
+          console.error(error);
+        }
+        
+      );
+  };
 
   return (
-    <div
-      className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999 }}
-      onClick={onClose} // CLOSE on outside click
-    >
-      <div
-        className="bg-white p-4 rounded shadow"
-        style={{ maxWidth: '600px', width: '90%' }}
-        onClick={(e) => e.stopPropagation()} // PREVENT closing when clicking inside form
-      >
-         {/* Logo on top */}
-        <div className="quote-logo">
-          <img
-            src="/images/Kayzonale logo.jpg"
-            alt="Kayzonale Logo"
-            style={{ width: '90px', height: 'auto' }}
-          />
-        </div>
-
-        <h4 className="mb-3 text-center">Quotation Request Form</h4>
+    <div className="d-flex justify-content-center align-items-center py-5 bg-light">
+      <div className="quote-form card shadow-lg p-4 rounded-4" style={{ maxWidth: "600px", width: "100%" }}>
+        <h2 className="text-center mb-4 fw-bold text-primary">Request a Quote</h2>
         <form onSubmit={handleSubmit}>
+          {/* Full Name */}
           <div className="mb-3">
-            <input type="text" className="form-control" placeholder="Full Name" required />
+            <label className="form-label fw-semibold">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="form-control rounded-3"
+              required
+            />
           </div>
+
+          {/* Email */}
           <div className="mb-3">
-            <input type="email" className="form-control" placeholder="Email Address" required />
+            <label className="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="form-control rounded-3"
+              required
+            />
           </div>
+
+          {/* Phone */}
           <div className="mb-3">
-            <input type="tel" className="form-control" placeholder="Phone Number" required />
+            <label className="form-label fw-semibold">Phone</label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="form-control rounded-3"
+            />
           </div>
+
+          {/* Service */}
           <div className="mb-3">
-            <select className="form-control" required>
-              <select value="">Select Service</select>
-              <option>Business Card design</option>
-              <option>Stationery Services</option>
-              <option>Large Format Printing</option>
-              <option>Plotting</option>
-              <option>Brand Identity Design</option>
-              <option>Embroidery</option>
-              <option></option>
+            <label className="form-label fw-semibold">Service</label>
+            <select
+              name="service"
+              value={formData.service}
+              onChange={handleChange}
+              className="form-select rounded-3"
+              required
+            >
+              <option value="">-- Select a Service --</option>
+              <option value="Large Format Printing">Large Format Printing</option>
+              <option value="Embroidery">Embroidery</option>
+              <option value="Branding">Branding</option>
+              <option value="Stationery Printing">Stationery Printing</option>
             </select>
           </div>
+
+          {/* Message */}
           <div className="mb-3">
-            <input type="number" className="form-control" placeholder="Quantity" required />
-          </div>
-          <div className="mb-3">
-            <input type="date" className="form-control" placeholder="Preferred Delivery Date" />
-          </div>
-          <div className="mb-3">
+            <label className="form-label fw-semibold">Message</label>
             <textarea
-              className="form-control"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              className="form-control rounded-3"
               rows="4"
-              placeholder="Job Description or Special Instructions"
             ></textarea>
           </div>
-          <div className="d-flex justify-content-between">
-            <button type="submit" className="btn btn-primary">
-              Submit
-            </button>
-            <button type="button" className="btn btn-outline-secondary" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="btn w-100 py-2 fw-bold text-white"
+            style={{
+              background: "linear-gradient(135deg, #007bff, #0056d2)",
+              border: "none",
+              borderRadius: "12px",
+              transition: "0.3s",
+            }}
+            onMouseOver={(e) => (e.target.style.background = "linear-gradient(135deg, #0056d2, #0041a8)")}
+            onMouseOut={(e) => (e.target.style.background = "linear-gradient(135deg, #007bff, #0056d2)")}
+          >
+          Submit Request
+          </button>
+
+          {/* Status Message */}
+          {status && (
+            <p className="mt-3 text-center fw-semibold" style={{ color: status.includes("✅") ? "green" : "red" }}>
+              {status}
+            </p>
+          )}
         </form>
       </div>
     </div>
   );
 };
 
-export default GetQuote;
+export default RequestQuote;

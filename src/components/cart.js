@@ -5,33 +5,34 @@ import { useCart } from "../components/cartContext";
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { cartItems, setCartItems } = useCart();
+  const { cartItems = [], updateQuantity, removeFromCart } = useCart();
 
-  const updateQuantity = (id, amount) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max((item.quantity || 1) + amount, 1) }
-          : item
-      )
-    );
-  };
+  // const updateQuantity = (id, amount) => {
+  //   CartItems(prev =>
+  //     prev.map(item =>
+  //       item.id === id
+  //         ? { ...item, quantity: Math.max((item.quantity || 1) + amount, 1) }
+  //         : item
+  //     )
+  //   );
+  // };
 
-  const removeItem = id => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-    // toast.info("Item removed from cart");
-  };
+  // const removeItem = id => {
+  //   CartItems(prev => prev.filter(item => item.id !== id));
+  //   // toast.info("Item removed from cart");
+  // };
 
-  const getTotal = () =>
-    cartItems.reduce(
-      (total, item) => total + item.price * (item.quantity || 1),
+  const getTotal = () => {
+    return cartItems.reduce(
+      (total, item) => total + (item.price * (item.quantity || 1)),
       0
     );
+  };
+
 
   const handleProceedToCheckout = () => {
-    // No login required — go straight to checkout
+    if (cartItems.length === 0) return;
     navigate("/CheckoutPaymentsPage");
-    onClose();
   };
 
   return (
@@ -86,14 +87,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       <td>{item.title}</td>
                       <td className="text-center">
                         <button
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() =>updateQuantity(item.id, (item.quantity || 1) - 1)}
                           className="btn btn-sm btn-outline-secondary"
                         >
                           -
                         </button>
                         <span className="mx-2">{item.quantity || 1}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, 1)}
+                          onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
                           className="btn btn-sm btn-outline-secondary"
                         >
                           +
@@ -108,7 +109,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       </td>
                       <td className="text-end">
                         <button
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeFromCart(item.id)}
                           className="btn btn-sm btn-outline-danger"
                         >
                           <i className="bi bi-trash"></i>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // For reading URL query
+import { useLocation } from 'react-router-dom';
 import '../styles/Products.css';
 import HeroSlider from '../components/HeroSlider';
 import FeaturedProducts from '../components/FeaturedProducts';
+import ProductCard from '../components/productCard';
+import { useCart } from '../components/cartContext';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -12,13 +14,9 @@ const ProductsPage = () => {
   const [fetchError, setFetchError] = useState(null);
 
   const location = useLocation();
+  const { addToCart } = useCart();
 
-  // Helper to get query params
-  const getQueryParams = (search) => {
-    return new URLSearchParams(search);
-  };
-
-  const queryParams = getQueryParams(location.search);
+  const queryParams = new URLSearchParams(location.search);
   const initialCategory = queryParams.get('category') || '';
 
   useEffect(() => {
@@ -30,7 +28,7 @@ const ProductsPage = () => {
 
       try {
         const res = await axios.get('http://localhost:5000/api/v1/products/', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
         if (isMounted) {
@@ -39,18 +37,19 @@ const ProductsPage = () => {
             title: p.title,
             description: p.description,
             image: p.image
-              ? `http://localhost:5000/uploads/products/${p.image}`
+              ? `http://localhost:5000/static/uploads/products/${p.image}`
               : '/images/business card.jpg',
             price: p.price,
             category: p.category || 'Uncategorized',
           }));
 
           setProducts(backendProducts);
+          setFetchError(null);
         }
       } catch (err) {
         console.error('Failed to fetch products:', err);
         if (isMounted) {
-          setFetchError('Failed to load products. Please try again later.');
+          setFetchError('Failed to load products. Showing offline data.');
           setProducts([]);
         }
       } finally {
@@ -62,7 +61,6 @@ const ProductsPage = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Filter by search and URL category
   const filteredProducts = products.filter(product => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,10 +78,7 @@ const ProductsPage = () => {
     <>
       <HeroSlider />
 
-    
-
       <div className="container my-5 product-page">
-        {/* Heading */}
         <div className="text-center mb-5">
           <h2 className="fw-bold">Our Products</h2>
           <p className="text-muted fs-5">
@@ -101,10 +96,9 @@ const ProductsPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <FeaturedProducts hideHeader={true} />
 
-        {/* Product Grid */}
         {isLoading ? (
           <div className="text-center my-5">
             <div className="spinner-border text-primary" role="status" />
@@ -115,22 +109,10 @@ const ProductsPage = () => {
           <div className="row g-4 justify-content-center">
             {filteredProducts.map(product => (
               <div key={product.id} className="col-md-4 col-sm-6">
-                <div className="card h-100 shadow-sm border-0">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="card-img-top mx-auto mt-4"
-                    style={{ height: '150px', width: 'auto', objectFit: 'contain' }}
-                  />
-                  <div className="card-body text-center">
-                    <h5 className="card-title fw-bold">{product.title}</h5>
-                    <p className="text-muted">{product.description}</p>
-                    <p className="text-secondary mb-1">
-                      <strong>Category:</strong> {product.category}
-                    </p>
-                    <p className="text-primary fw-semibold">Price: UGX {product.price}</p>
-                  </div>
-                </div>
+                <ProductCard
+                  product={product}
+                  AddToCart={() => addToCart(product)}
+                />
               </div>
             ))}
           </div>

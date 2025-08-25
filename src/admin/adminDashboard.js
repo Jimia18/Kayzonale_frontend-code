@@ -1,87 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import DashboardLayout from './dashboardLayout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Spinner } from 'react-bootstrap';
-import { toast } from 'react-toastify';
-import api from '../api';
-import AdminSidebar from '../components/AdminSidebar';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import DashboardLayout from "./dashboardLayout";
+import AdminSidebar from "../components/AdminSidebar";
+import { Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const AdminDashboard = () => {
-  // State management
-  const [dashboardData, setDashboardData] = useState({
-    stats: { total_orders: 0, pending_orders: 0, completed_orders: 0 },
-    recentOrders: [],
-    recentPayments: []
-  });
-  
-  const [loading, setLoading] = useState({
-    stats: true,
-    orders: true,
-    payments: true
-  });
-  
+  const [stats, setStats] = useState({});
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [recentPayments, setRecentPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 992);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Data fetching
+  // Function to get token from localStorage/sessionStorage
+  const getToken = () => {
+    return localStorage.getItem("token") || sessionStorage.getItem("token");
+  };
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
+        const token = getToken();
+        if (!token) throw new Error("No auth token found");
+
+        const headers = { Authorization: `Bearer ${token}` };
+
         const [statsRes, ordersRes, paymentsRes] = await Promise.all([
-          api.get('/orders/stats'),
-          api.get('/orders?limit=5'),
-          api.get('/payments?limit=5')
+          axios.get("http://localhost:5000/api/v1/orders/stats", { headers }),
+          axios.get("http://localhost:5000/api/v1/orders/filter?limit=5", { headers }),
+          axios.get("http://localhost:5000/api/v1/orders/report/financial", { headers }),
         ]);
 
-        setDashboardData({
-          stats: statsRes.data,
-          recentOrders: ordersRes.data,
-          recentPayments: paymentsRes.data.slice(0, 5)
-        });
+        setStats(statsRes.data);
+        setRecentOrders(ordersRes.data);
+        setRecentPayments(paymentsRes.data.report || []);
       } catch (error) {
-        toast.error("Failed to load dashboard data");
+        toast.error("Failed to fetch dashboard data");
+        console.error(error);
       } finally {
-        setLoading({ stats: false, orders: false, payments: false });
+        setLoading(false);
       }
     };
 
-    fetchDashboardData();
+    fetchData();
   }, []);
 
-  // Chart data preparation
-  const chartData = [
-    { name: 'Total', value: dashboardData.stats.total_orders },
-    { name: 'Pending', value: dashboardData.stats.pending_orders },
-    { name: 'Completed', value: dashboardData.stats.completed_orders },
-  ];
-
-  // Helper components
-  const renderLoadingSpinner = () => (
+  const renderSpinner = () => (
     <div className="text-center py-4">
       <Spinner animation="border" variant="primary" />
     </div>
   );
 
-  const renderNoDataMessage = () => <p>No data available.</p>;
-
   const renderTable = (data, columns) => (
     <table className="table table-sm">
       <thead>
         <tr>
-          {columns.map(col => <th key={col.key}>{col.header}</th>)}
+          {columns.map((col) => (
+            <th key={col.key}>{col.header}</th>
+          ))}
         </tr>
       </thead>
       <tbody>
-        {data.map(item => (
-          <tr key={item.id || item.order_id || item.payment_id}>
-            {columns.map(col => (
+        {data.map((item, idx) => (
+          <tr key={item.order_id || item.payment_id || idx}>
+            {columns.map((col) => (
               <td key={col.key}>
                 {col.render ? col.render(item) : item[col.key]}
               </td>
@@ -101,48 +92,92 @@ const AdminDashboard = () => {
       isMobile={isMobile}
       SidebarComponent={AdminSidebar}
     >
-      {/* Statistics Section */}
-      <section className="mb-5 bg-white p-4 rounded shadow-sm">
-        <h5 className="mb-3">📊 Order Statistics</h5>
-        {loading.stats ? (
-          renderLoadingSpinner()
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar 
-                dataKey="value" 
-                fill="#0d6efd" 
-                radius={[6, 6, 0, 0]} 
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
+      {/* Stats Cards */}
+      <section className="row mb-4">
+        <div className="col-md-3 col-6 mb-3">
+          <div className="bg-white p-3 rounded shadow-sm text-center">
+            <h6 className="text-muted">Total Orders</h6>
+            <h3 className="text-primary">{stats.total_orders || 0}</h3>
+            <small className="text-muted">All time</small>
+          </div>
+        </div>
+        <div className="col-md-3 col-6 mb-3">
+          <div className="bg-white p-3 rounded shadow-sm text-center">
+            <h6 className="text-muted">Pending Orders</h6>
+            <h3 className="text-warning">{stats.pending_orders || 0}</h3>
+            <small className="text-muted">Awaiting processing</small>
+          </div>
+        </div>
+        <div className="col-md-3 col-6 mb-3">
+          <div className="bg-white p-3 rounded shadow-sm text-center">
+            <h6 className="text-muted">Completed Orders</h6>
+            <h3 className="text-success">{stats.completed_orders || 0}</h3>
+            <small className="text-muted">Successfully delivered</small>
+          </div>
+        </div>
+        <div className="col-md-3 col-6 mb-3">
+          <div className="bg-white p-3 rounded shadow-sm text-center">
+            <h6 className="text-muted">Today's Orders</h6>
+            <h3 className="text-info">{stats.today_orders || 0}</h3>
+            <small className="text-muted">Placed today</small>
+          </div>
+        </div>
       </section>
 
-      {/* Recent Data Section */}
+      {/* Revenue Cards */}
+      <section className="row mb-5">
+        <div className="col-md-6 mb-3">
+          <div className="bg-white p-4 rounded shadow-sm">
+            <h6 className="text-muted mb-3">💰 Total Revenue</h6>
+            {loading ? (
+              renderSpinner()
+            ) : (
+              <div className="d-flex align-items-center">
+                <h2 className="text-success mb-0">
+                  UGX {stats.total_revenue ? Number(stats.total_revenue).toLocaleString() : 0}
+                </h2>
+              </div>
+            )}
+            <small className="text-muted">All time revenue</small>
+          </div>
+        </div>
+        <div className="col-md-6 mb-3">
+          <div className="bg-white p-4 rounded shadow-sm">
+            <h6 className="text-muted mb-3">📈 Monthly Revenue</h6>
+            {loading ? (
+              renderSpinner()
+            ) : (
+              <div className="d-flex align-items-center">
+                <h2 className="text-primary mb-0">
+                  UGX {stats.monthly_revenue ? Number(stats.monthly_revenue).toLocaleString() : 0}
+                </h2>
+              </div>
+            )}
+            <small className="text-muted">Revenue this month</small>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Orders & Payments */}
       <section className="row">
         {/* Recent Orders */}
         <div className="col-md-6 mb-4">
           <div className="bg-white p-4 rounded shadow-sm h-100">
             <h6 className="mb-3">🛒 Recent Orders</h6>
-            {loading.orders ? (
-              renderLoadingSpinner()
-            ) : dashboardData.recentOrders.length === 0 ? (
-              renderNoDataMessage()
-            ) : (
-              renderTable(dashboardData.recentOrders, [
-                { key: 'order_id', header: 'ID' },
-                { key: 'status', header: 'Status' },
-                { 
-                  key: 'created_at', 
-                  header: 'Date',
-                  render: (item) => new Date(item.created_at).toLocaleDateString()
-                }
-              ])
-            )}
+            {loading
+              ? renderSpinner()
+              : recentOrders.length === 0
+              ? <div className="text-center text-muted py-4">No orders found.</div>
+              : renderTable(recentOrders, [
+                  { key: "order_id", header: "ID" },
+                  { key: "status", header: "Status" },
+                  {
+                    key: "created_at",
+                    header: "Date",
+                    render: (item) =>
+                      new Date(item.created_at).toLocaleDateString(),
+                  },
+                ])}
           </div>
         </div>
 
@@ -150,25 +185,25 @@ const AdminDashboard = () => {
         <div className="col-md-6 mb-4">
           <div className="bg-white p-4 rounded shadow-sm h-100">
             <h6 className="mb-3">💵 Recent Payments</h6>
-            {loading.payments ? (
-              renderLoadingSpinner()
-            ) : dashboardData.recentPayments.length === 0 ? (
-              renderNoDataMessage()
-            ) : (
-              renderTable(dashboardData.recentPayments, [
-                { 
-                  key: 'amount', 
-                  header: 'Amount',
-                  render: (item) => `UGX ${item.amount.toLocaleString()}`
-                },
-                { key: 'method', header: 'Method' },
-                { 
-                  key: 'created_at', 
-                  header: 'Date',
-                  render: (item) => new Date(item.created_at).toLocaleDateString()
-                }
-              ])
-            )}
+            {loading
+              ? renderSpinner()
+              : recentPayments.length === 0
+              ? <div className="text-center text-muted py-4">No payments found.</div>
+              : renderTable(recentPayments, [
+                  {
+                    key: "amount",
+                    header: "Amount",
+                    render: (item) =>
+                      `UGX ${Number(item.amount).toLocaleString()}`,
+                  },
+                  { key: "method", header: "Method" },
+                  {
+                    key: "created_at",
+                    header: "Date",
+                    render: (item) =>
+                      new Date(item.created_at).toLocaleDateString(),
+                  },
+                ])}
           </div>
         </div>
       </section>

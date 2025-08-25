@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import GetQuote from './getQuote';
 import CartSidebar from './cart';
 import { useCart } from '../components/cartContext';
 
 const Header = () => {
-  const [showQuoteForm, setShowQuoteForm] = useState(false);
+  //const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { cartItems } = useCart();
 
@@ -57,7 +56,7 @@ const Header = () => {
                 <li><NavLink to="/login" className="dropdown-item">Sign In</NavLink></li>
                 <li><NavLink to="/register" className="dropdown-item">Register</NavLink></li>
                 <li><hr className="dropdown-divider" /></li>
-                <li><NavLink to="/account" className="dropdown-item">My Account</NavLink></li>
+                <li><NavLink to="/ClientsProfile" className="dropdown-item">My Account</NavLink></li>
                 <li><NavLink to="/orders" className="dropdown-item">Orders</NavLink></li>
               </ul>
             </div>
@@ -104,21 +103,16 @@ const Header = () => {
               <div className="small text-muted">CALL US NOW:</div>
               <div className="fw-bold text-pink">0705 783322</div>
             </div>
-            <button
-              className="btn btn-dark text-white fw-semibold px-4 py-2"
-              onClick={() => setShowQuoteForm(true)}
-            >
-              Express Project ?
-            </button>
+             <NavLink to="/getQuote" className="btn btn-dark text-white fw-semibold px-4 py-2">
+  Express Project ?
+</NavLink>
+
           </div>
         </div>
       </div>
 
       {/* Offset for fixed header */}
       <div style={{ paddingTop: '170px' }}></div>
-
-      {/* GetQuote Modal */}
-      <GetQuote show={showQuoteForm} onClose={() => setShowQuoteForm(false)} />
 
       {/* Cart Sidebar */}
       <CartSidebar

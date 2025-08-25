@@ -41,7 +41,7 @@ const Footer = () => {
               className="img-fluid mb-3"
               style={{ maxWidth: '150px', height: 'auto' }}
             />
-            <p className="mb-1"><a href="mailto:info@kayzonaledesigns.com"> 📧  Kayzonaledesigns@gmail.com</a></p>
+            <p className="mb-1"><a href="mailto:info@kayzonaledesigns.com"> 📧 Kayzonaledesigns@gmail.com</a></p>
             <a href="tel:+256777274239" className="footer-link"> 📞 +256 (0) 777274239</a><br />
             <p className="mb-0 fs-6"> 📍 Kitgum Stage, Lira City</p>
           </div>
@@ -69,13 +69,15 @@ const Footer = () => {
           </div>
 
           {/* Categories */}
-          <div className="col-md-2 text-center text-md-start px-">
+          <div className="col-md-2 text-center text-md-start">
             <h6 className="fw-bold fs-4">Categories</h6>
             <ul className="list-unstyled fs-6">
-              <li><a href="/brochures" className="footer-link">Brochures in Uganda</a></li>
-              <li><a href="/pullup-banners" className="footer-link">Pullup Banners</a></li>
-              <li><a href="/promotional-products" className="footer-link">Promotional Products</a></li>
-              <li><a href="/valentine-gifts" className="footer-link">Valentine Gifts</a></li>
+              <li><a href="/products?category=large-format-printing" className="footer-link">Large Format Printing</a></li>
+              <li><a href="/products?category=embroidery" className="footer-link">Printing & Embroidery</a></li>
+              <li><a href="/products?category=branding" className="footer-link">Branding (Cloth & Paper)</a></li>
+              <li><a href="/products?category=tshirts" className="footer-link">Branded T-Shirts</a></li>
+              <li><a href="/products?category=tags" className="footer-link">Tags & Stickers</a></li>
+              <li><a href="/products?category=calendars" className="footer-link">Calendars & Gifts</a></li>
             </ul>
           </div>
 

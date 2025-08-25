@@ -13,8 +13,6 @@ import { FiGrid, FiList } from "react-icons/fi";
 import ProductCard from "../components/productCard";
 import FilterSidebar from "../components/FilterSideBar";
 import { useCart } from "../components/cartContext";
-import productsData from "../components/Products"; // fallback if API fails
-import api from "../api"; // your Axios instance
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
@@ -26,11 +24,18 @@ const ShopPage = () => {
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState("grid");
+  const [totalPages, setTotalPages] = useState(1);
 
   const productsPerPage = 9;
   const { addToCart } = useCart();
+  
 
-  // Fixed categories list
+  const API_BASE = "http://localhost:5000/api/v1/products";
+
+  const token = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")).access_token
+    : null;
+
   const categories = [
     "All",
     "Large Format Printing",
@@ -40,31 +45,42 @@ const ShopPage = () => {
     "Specialty & Seasonal",
   ];
 
+  // Fetch products from backend with pagination
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/products/");
-        const fetchedProducts =
-          Array.isArray(res.data)
-            ? res.data
-            : Array.isArray(res.data?.data?.products)
-            ? res.data.data.products
-            : [];
+        const res = await fetch(
+          `${API_BASE}/?page=${currentPage}&limit=${productsPerPage}`,
+          {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : undefined,
+            },
+          }
+        );
+        const data = await res.json();
 
-        setProducts(fetchedProducts);
-        setError("");
-      } catch (e) {
-        console.warn("API fetch failed, using fallback.", e);
-        setProducts(productsData || []);
-        setError("Showing offline product data.");
+        if (res.ok && data.success) {
+          setProducts(data.data.products || []);
+          setTotalPages(data.data.meta.pages || 1);
+          setError("");
+        } else {
+          setError("Failed to fetch products from server.");
+          setProducts([]);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Network error. Showing empty product list.");
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
-  }, []);
 
+    fetchProducts();
+  }, [token, currentPage]);
+
+  // Convert and format prices
   const toPrice = (p) => {
     const n =
       typeof p === "number" ? p : parseFloat(String(p).replace(/[, ]/g, ""));
@@ -78,6 +94,7 @@ const ShopPage = () => {
       maximumFractionDigits: 0,
     }).format(toPrice(price));
 
+  // Apply client-side filters (search, category, price, sorting)
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) =>
@@ -85,7 +102,9 @@ const ShopPage = () => {
           ? true
           : (p.category || "").toLowerCase() === selectedCategory.toLowerCase()
       )
-      .filter((p) => (p.title || "").toLowerCase().includes(search.toLowerCase()))
+      .filter((p) =>
+        (p.title || "").toLowerCase().includes(search.toLowerCase())
+      )
       .filter((p) => {
         const price = toPrice(p.price);
         return price >= priceRange[0] && price <= priceRange[1];
@@ -93,26 +112,20 @@ const ShopPage = () => {
       .sort((a, b) => {
         if (sortOption === "priceLow") return toPrice(a.price) - toPrice(b.price);
         if (sortOption === "priceHigh") return toPrice(b.price) - toPrice(a.price);
-        if (sortOption === "nameAsc") return (a.title || "").localeCompare(b.title || "");
-        if (sortOption === "nameDesc") return (b.title || "").localeCompare(a.title || "");
+        if (sortOption === "nameAsc")
+          return (a.title || "").localeCompare(b.title || "");
+        if (sortOption === "nameDesc")
+          return (b.title || "").localeCompare(a.title || "");
         return 0;
       });
   }, [products, selectedCategory, search, priceRange, sortOption]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / productsPerPage));
-
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
-
-  const handleAddToCart = (product) => addToCart(product);
 
   return (
     <Container fluid className="p-1">
       <h2 className="fw-bold mb-4 text-center mt-5">All Products</h2>
 
       <Row>
+        {/* Sidebar */}
         <Col md={3}>
           <FilterSidebar
             categories={categories}
@@ -129,8 +142,8 @@ const ShopPage = () => {
           />
         </Col>
 
+        {/* Main Content */}
         <Col md={9}>
-          {/* Top Bar: Search, Sort, View Toggle */}
           <div className="d-flex justify-content-between mb-4 flex-wrap">
             <Form.Control
               type="text"
@@ -173,30 +186,39 @@ const ShopPage = () => {
             </div>
           </div>
 
-          {/* Loading, Error, or Product List */}
+          {/* Loading / Error / Product List */}
           {loading ? (
             <div className="text-center">
               <Spinner animation="border" variant="primary" />
             </div>
           ) : error ? (
             <Alert variant="warning">{error}</Alert>
-          ) : paginatedProducts.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <Alert variant="info">No products found.</Alert>
           ) : (
-            <Row xs={1} sm={2} md={viewMode === "grid" ? 3 : 1} className="g-4">
-              {paginatedProducts.map((product) => (
+            <Row
+              xs={1}
+              sm={2}
+              md={viewMode === "grid" ? 3 : 1}
+              className="g-4"
+            >
+              {filteredProducts.map((product) => (
                 <Col key={product.id}>
                   <ProductCard
                     product={{
-                      ...product,
+                      ...product,                      
                       image: product.image
                         ? product.image.startsWith("http")
                           ? product.image
-                          : `http://localhost:5000/uploads/products/${product.image}`
-                        : "/images/business card.jpg",
+                          : `/` + product.image
+                          .replace(/\\/g, '/')
+                          .split('/')
+                          .map(encodeURIComponent)
+                          .join('/')
+                        : '/placeholder.jpg',
                       formattedPrice: formatPrice(product.price),
                     }}
-                    AddToCart={handleAddToCart}
+                    AddToCart={addToCart}
                     viewMode={viewMode}
                   />
                 </Col>

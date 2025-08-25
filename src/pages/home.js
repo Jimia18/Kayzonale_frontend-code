@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../styles/home.css';
-import GetQuote from '../components/getQuote';
+//import GetQuote from '../components/getQuote';
 import HeroSliderhome from '../components/Herosliderhome';
 //import FeaturedProducts from '../components/FeaturedProducts';
 import Testimonials from '../components/testimonials';
 import FeaturedProducts from '../components/FeaturedProducts';
 
 const HomePage = () => {
-  const [showQuoteForm, setShowQuoteForm] = useState(false);
+  //const [showQuoteForm, setShowQuoteForm] = useState(false);
 
   return (
     <div className="text-gray-800 font-sans ">
         <main className="flex-grow-1">
 
       {/* Hero Section */}
-      <HeroSliderhome onQuoteClick={() => setShowQuoteForm(true)} />
+      <HeroSliderhome  />
 
       {/* Featured Products Section */}
       <FeaturedProducts/>
@@ -216,8 +216,7 @@ style={{ background: 'linear-gradient(-45deg, #6faaddff, #ae7588aa, #b6ecefff, #
       </section>
       </main>
 
-      {/* GetQuote Modal */}
-      <GetQuote show={showQuoteForm} onClose={() => setShowQuoteForm(false)} />
+      
 
     </div>
   );
