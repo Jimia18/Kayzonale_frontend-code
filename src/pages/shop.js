@@ -1,110 +1,65 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Spinner,
-  Pagination,
-  Alert,
-  Button,
-} from "react-bootstrap";
+import { Container, Row, Col, Form, Spinner, Alert, Button, Pagination } from "react-bootstrap";
 import { FiGrid, FiList } from "react-icons/fi";
 import ProductCard from "../components/productCard";
 import FilterSidebar from "../components/FilterSideBar";
 import { useCart } from "../components/cartContext";
+import axios from "axios";
 
 const ShopPage = () => {
+  const { addToCart } = useCart();
+
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [priceRange, setPriceRange] = useState([0, 1000000]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState("grid");
-  const [totalPages, setTotalPages] = useState(1);
 
   const productsPerPage = 9;
-  const { addToCart } = useCart();
-  
 
-  const API_BASE = "http://localhost:5000/api/v1/products";
-
-  const token = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user")).access_token
-    : null;
-
-  const categories = [
-    "All",
-    "Large Format Printing",
-    "Printing & Embroidery",
-    "Branding & Stationery",
-    "Paper & Promotional Products",
-    "Specialty & Seasonal",
-  ];
-
-  // Fetch products from backend with pagination
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `${API_BASE}/?page=${currentPage}&limit=${productsPerPage}`,
-          {
-            headers: {
-              Authorization: token ? `Bearer ${token}` : undefined,
-            },
-          }
-        );
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          setProducts(data.data.products || []);
-          setTotalPages(data.data.meta.pages || 1);
-          setError("");
-        } else {
-          setError("Failed to fetch products from server.");
-          setProducts([]);
-        }
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        const res = await axios.get(`${API_BASE_URL}/api/v1/products/public`);
+        const data = res.data.map((p) => ({
+          ...p,
+          price: Number(p.price),
+          image: p.image ? `${API_BASE_URL}/${p.image.replace(/^\/+/, "")}` : "/images/pathto.jpg"
+        }));
+        setProducts(data);
+        setError("");
       } catch (err) {
-        console.error("Error fetching products:", err);
-        setError("Network error. Showing empty product list.");
-        setProducts([]);
+        console.error(err);
+        setError("Failed to fetch products.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [token, currentPage]);
+  }, []);
 
-  // Convert and format prices
-  const toPrice = (p) => {
-    const n =
-      typeof p === "number" ? p : parseFloat(String(p).replace(/[, ]/g, ""));
-    return Number.isFinite(n) ? n : 0;
-  };
+  // Dynamic categories
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    return ["All", ...cats];
+  }, [products]);
 
-  const formatPrice = (price) =>
-    new Intl.NumberFormat("en-UG", {
-      style: "currency",
-      currency: "UGX",
-      maximumFractionDigits: 0,
-    }).format(toPrice(price));
+  // Price helper
+  const toPrice = (p) => (typeof p === "number" ? p : parseFloat(String(p).replace(/[, ]/g, "")) || 0);
 
-  // Apply client-side filters (search, category, price, sorting)
+  // Filter + Sort products
   const filteredProducts = useMemo(() => {
     return products
-      .filter((p) =>
-        selectedCategory === "All"
-          ? true
-          : (p.category || "").toLowerCase() === selectedCategory.toLowerCase()
-      )
-      .filter((p) =>
-        (p.title || "").toLowerCase().includes(search.toLowerCase())
-      )
+      .filter((p) => selectedCategory === "All" || (p.category || "").toLowerCase() === selectedCategory.toLowerCase())
+      .filter((p) => (p.title || "").toLowerCase().includes(search.toLowerCase()))
       .filter((p) => {
         const price = toPrice(p.price);
         return price >= priceRange[0] && price <= priceRange[1];
@@ -112,17 +67,19 @@ const ShopPage = () => {
       .sort((a, b) => {
         if (sortOption === "priceLow") return toPrice(a.price) - toPrice(b.price);
         if (sortOption === "priceHigh") return toPrice(b.price) - toPrice(a.price);
-        if (sortOption === "nameAsc")
-          return (a.title || "").localeCompare(b.title || "");
-        if (sortOption === "nameDesc")
-          return (b.title || "").localeCompare(a.title || "");
+        if (sortOption === "nameAsc") return (a.title || "").localeCompare(b.title || "");
+        if (sortOption === "nameDesc") return (b.title || "").localeCompare(a.title || "");
         return 0;
       });
   }, [products, selectedCategory, search, priceRange, sortOption]);
 
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage) || 1;
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
+
   return (
-    <Container fluid className="p-1">
-      <h2 className="fw-bold mb-4 text-center mt-5">All Products</h2>
+    <Container fluid className="p-3">
+      <h2 className="fw-bold mb-4 text-center mt-4">All Products</h2>
 
       <Row>
         {/* Sidebar */}
@@ -144,11 +101,11 @@ const ShopPage = () => {
 
         {/* Main Content */}
         <Col md={9}>
-          <div className="d-flex justify-content-between mb-4 flex-wrap">
+          <div className="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-2">
             <Form.Control
               type="text"
               placeholder="Search products..."
-              style={{ width: 300, minWidth: "100%" }}
+              style={{ maxWidth: 300 }}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -156,13 +113,8 @@ const ShopPage = () => {
               }}
             />
 
-            <div className="d-flex align-items-center mt-2 mt-md-0">
-              <Form.Select
-                className="me-3"
-                style={{ width: 200 }}
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-              >
+            <div className="d-flex align-items-center gap-2">
+              <Form.Select style={{ width: 200 }} value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
                 <option value="">Sort by</option>
                 <option value="priceLow">Price: Low to High</option>
                 <option value="priceHigh">Price: High to Low</option>
@@ -170,57 +122,28 @@ const ShopPage = () => {
                 <option value="nameDesc">Name: Z–A</option>
               </Form.Select>
 
-              <Button
-                variant={viewMode === "grid" ? "primary" : "outline-secondary"}
-                className="me-2"
-                onClick={() => setViewMode("grid")}
-              >
+              <Button variant={viewMode === "grid" ? "primary" : "outline-secondary"} onClick={() => setViewMode("grid")}>
                 <FiGrid />
               </Button>
-              <Button
-                variant={viewMode === "list" ? "primary" : "outline-secondary"}
-                onClick={() => setViewMode("list")}
-              >
+              <Button variant={viewMode === "list" ? "primary" : "outline-secondary"} onClick={() => setViewMode("list")}>
                 <FiList />
               </Button>
             </div>
           </div>
 
-          {/* Loading / Error / Product List */}
           {loading ? (
-            <div className="text-center">
+            <div className="text-center mt-5">
               <Spinner animation="border" variant="primary" />
             </div>
           ) : error ? (
             <Alert variant="warning">{error}</Alert>
-          ) : filteredProducts.length === 0 ? (
+          ) : paginatedProducts.length === 0 ? (
             <Alert variant="info">No products found.</Alert>
           ) : (
-            <Row
-              xs={1}
-              sm={2}
-              md={viewMode === "grid" ? 3 : 1}
-              className="g-4"
-            >
-              {filteredProducts.map((product) => (
+            <Row xs={1} sm={2} md={viewMode === "grid" ? 3 : 1} className="g-4">
+              {paginatedProducts.map((product) => (
                 <Col key={product.id}>
-                  <ProductCard
-                    product={{
-                      ...product,                      
-                      image: product.image
-                        ? product.image.startsWith("http")
-                          ? product.image
-                          : `/` + product.image
-                          .replace(/\\/g, '/')
-                          .split('/')
-                          .map(encodeURIComponent)
-                          .join('/')
-                        : '/placeholder.jpg',
-                      formattedPrice: formatPrice(product.price),
-                    }}
-                    AddToCart={addToCart}
-                    viewMode={viewMode}
-                  />
+                  <ProductCard product={product} viewMode={viewMode} addToCart={addToCart} />
                 </Col>
               ))}
             </Row>
@@ -230,23 +153,13 @@ const ShopPage = () => {
           {totalPages > 1 && (
             <div className="d-flex justify-content-center mt-4">
               <Pagination>
-                <Pagination.Prev
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                />
+                <Pagination.Prev disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} />
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <Pagination.Item
-                    key={i + 1}
-                    active={i + 1 === currentPage}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
+                  <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => setCurrentPage(i + 1)}>
                     {i + 1}
                   </Pagination.Item>
                 ))}
-                <Pagination.Next
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                />
+                <Pagination.Next disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} />
               </Pagination>
             </div>
           )}

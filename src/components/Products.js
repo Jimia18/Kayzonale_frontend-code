@@ -1,41 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import '../styles/featuredProducts.css';
 
 const Product = () => {
-  const [products, setProducts] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(4);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [loading, setLoading] = useState(true);
 
-  // Fetch products from backend
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get('/api/v1/products');
-        setProducts(res.data.products);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+
+  
 
   // Extract unique categories from products
-  const categories = ['All', ...new Set(products.map(p => p.category))];
+  const categories = ['All'];
 
-  // Filtered + limited products
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
-
-  const loadMore = () => setVisibleCount(prev => prev + 4);
 
   return (
     <section className="featured-section py-5 text-center">

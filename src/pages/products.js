@@ -1,125 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
-import '../styles/Products.css';
-import HeroSlider from '../components/HeroSlider';
-import FeaturedProducts from '../components/FeaturedProducts';
-import ProductCard from '../components/productCard';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '../components/cartContext';
+import HeroSlider from '../components/HeroSlider';
+import axios from 'axios';
+import '../styles/featuredProducts.css';
+import '../styles/sectionHeader.css';
+
+const hardcodedProducts = [
+  { id: 3, title: 'Double-Sided Roller Banners', price: 190000, category: 'Large Format Printing', img: '/images/double_roller.jpg' },
+  { id: 4, title: 'Teardrop Banners', price: 235000, category: 'Large Format Printing', img: '/images/teardrop_banner.jpg' },
+  //{ id: 5, title: 'Rectangle Flag Banners', price: 235000, category: 'Specialty & Seasonal', img: '/images/rectangle_flag.jpg' },
+  //{ id: 9, title: 'Glossy Business Cards', price: 24500, category: 'Branding & Stationery', img: '/images/glossy_cards.jpg' },
+  { id: 10, title: 'Square Business Cards', price: 20000, category: 'Branding & Stationery', img: '/images/business card.jpg' },
+  { id: 11, title: 'Self-Inked Stamps', price: 85000, category: 'Printing & Embroidery', img: '/images/stamps.jpg' },
+  //{ id: 12, title: 'Customized Paper Bags', price: 6000, category: 'Paper & Promotional Products', img: '/images/paper_bag.jpg' },
+];
+
+const categories = [
+  'All',
+  'Large Format Printing',
+  'Printing & Embroidery',
+  'Branding & Stationery',
+  'Paper & Promotional Products',
+  'Specialty & Seasonal',
+];
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(null);
-
-  const location = useLocation();
+  const [dynamicProducts, setDynamicProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
   const { addToCart } = useCart();
 
-  const queryParams = new URLSearchParams(location.search);
-  const initialCategory = queryParams.get('category') || '';
-
   useEffect(() => {
-    let isMounted = true;
-
     const fetchProducts = async () => {
-      const storedUser = localStorage.getItem('user');
-      const token = storedUser ? JSON.parse(storedUser).access_token : null;
-
       try {
-        const res = await axios.get('http://localhost:5000/api/v1/products/', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        if (isMounted) {
-          const backendProducts = (res.data?.data?.products || []).map(p => ({
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            image: p.image
-              ? `http://localhost:5000/static/uploads/products/${p.image}`
-              : '/images/business card.jpg',
-            price: p.price,
-            category: p.category || 'Uncategorized',
-          }));
-
-          setProducts(backendProducts);
-          setFetchError(null);
-        }
+        const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const res = await axios.get(`${API_BASE_URL}/api/v1/products/public`);
+        const products = res.data.map(p => ({
+          id: p.id,
+          title: p.title,
+          price: p.price,
+          category: p.category,
+          img: p.image ? `${API_BASE_URL}/${p.image.replace(/^\/+/, '')}` : '/images/pathto.jpg'
+        }));
+        setDynamicProducts(products);
       } catch (err) {
-        console.error('Failed to fetch products:', err);
-        if (isMounted) {
-          setFetchError('Failed to load products. Showing offline data.');
-          setProducts([]);
-        }
+        console.error('Failed to fetch products', err);
       } finally {
-        if (isMounted) setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchProducts();
-    return () => { isMounted = false; };
   }, []);
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch =
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase());
+  const allProducts = [...hardcodedProducts, ...dynamicProducts];
 
-    const matchesCategory = initialCategory
-      ? product.category.toLowerCase() === initialCategory.toLowerCase()
-      : true;
-
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = activeCategory === 'All'
+    ? allProducts
+    : allProducts.filter(p => p.category === activeCategory);
 
   return (
     <>
       <HeroSlider />
-
-      <div className="container my-5 product-page">
-        <div className="text-center mb-5">
-          <h2 className="fw-bold">Our Products</h2>
-          <p className="text-muted fs-5">
-            Browse our premium selection of products tailored to meet your household or business needs.
-          </p>
-        </div>
-
-        {/* Search Input */}
-        <div className="mb-4 text-center">
-          <input
-            type="text"
-            className="form-control search-input w-50 mx-auto"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <FeaturedProducts hideHeader={true} />
-
-        {isLoading ? (
-          <div className="text-center my-5">
-            <div className="spinner-border text-primary" role="status" />
+      <section className="py-5 bg-light">
+        <div className="container">
+          <div className="section-header text-center py-2">
+            <h1 className="main-heading heading-underline">
+              PRINTING MADE <span className="text-primary"> Easy for you</span>
+            </h1>
+            <p className="subheading" style={{ fontSize: '1.5rem' }}>Products</p>
           </div>
-        ) : fetchError && products.length === 0 ? (
-          <div className="alert alert-danger text-center">{fetchError}</div>
-        ) : filteredProducts.length > 0 ? (
-          <div className="row g-4 justify-content-center">
-            {filteredProducts.map(product => (
-              <div key={product.id} className="col-md-4 col-sm-6">
-                <ProductCard
-                  product={product}
-                  AddToCart={() => addToCart(product)}
-                />
-              </div>
+
+          {/* Category Tabs */}
+          <div className="category-tabs mt-3 mb-4">
+            {categories.map(category => (
+              <button
+                key={category}
+                className={`category-tab ${activeCategory === category ? 'active' : ''}`}
+                onClick={() => setActiveCategory(category)}
+              >
+                {category}
+              </button>
             ))}
           </div>
-        ) : (
-          <div className="text-center text-muted">No products found.</div>
-        )}
-      </div>
+
+          {/* Product Grid */}
+          {loading ? (
+            <p className="text-center">Loading products...</p>
+          ) : (
+            <div className="row g-4 mt-2">
+              {filteredProducts.map(product => (
+                <div key={product.id} className="col-sm-6 col-md-4 col-lg-3">
+                  <div className="card h-100 shadow product-card">
+                    <img
+                      src={product.img}
+                      className="card-img-top"
+                      alt={product.title}
+                      style={{ height: '200px', objectFit: 'cover' }}
+                      onError={(e) => (e.target.src = '/images/pathto.jpg')}
+                    />
+                    <div className="card-body text-center">
+                      <h5 className="card-title">{product.title}</h5>
+                      <p className="card-text fw-bold">UGX {product.price.toLocaleString()}</p>
+                      <button
+                        onClick={() => addToCart(product)}
+                        className="btn btn-primary btn-sm"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
     </>
   );
 };

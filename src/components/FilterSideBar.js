@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+//import "./filterSidebar.css"; // optional for extra styles
 
 const FilterSidebar = ({
   categories,
@@ -7,8 +8,16 @@ const FilterSidebar = ({
   priceRange,
   onPriceChange,
 }) => {
+  const [minPrice, setMinPrice] = useState(priceRange[0]);
+  const [maxPrice, setMaxPrice] = useState(priceRange[1]);
+
+  useEffect(() => {
+    onPriceChange([minPrice, maxPrice]);
+  }, [minPrice, maxPrice, onPriceChange]);
+
   return (
-    <div className="filter-sidebar p-3">
+    <div className="filter-sidebar p-3 border rounded shadow-sm">
+      {/* Categories */}
       <h5 className="mb-3">Categories</h5>
       <select
         className="form-select mb-4"
@@ -22,17 +31,50 @@ const FilterSidebar = ({
         ))}
       </select>
 
-      {/* Price Filter Example */}
+      {/* Price Range */}
       <div className="mt-4">
         <h6>Price Range</h6>
+        <div className="d-flex gap-2 mb-2">
+          <input
+            type="number"
+            className="form-control"
+            style={{ width: "45%" }}
+            value={minPrice}
+            min={0}
+            max={maxPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+          />
+          <input
+            type="number"
+            className="form-control"
+            style={{ width: "45%" }}
+            value={maxPrice}
+            min={minPrice}
+            max={1000000}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+          />
+        </div>
+
         <input
           type="range"
           min={0}
           max={1000000}
-          value={priceRange[1]}
-          onChange={(e) => onPriceChange([priceRange[0], Number(e.target.value)])}
+          value={minPrice}
+          onChange={(e) => setMinPrice(Number(e.target.value))}
+          className="form-range mb-2"
         />
-        <div>Max: UGX {priceRange[1].toLocaleString()}</div>
+        <input
+          type="range"
+          min={0}
+          max={1000000}
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(Number(e.target.value))}
+          className="form-range"
+        />
+
+        <div className="mt-1 text-muted">
+          UGX {minPrice.toLocaleString()} – UGX {maxPrice.toLocaleString()}
+        </div>
       </div>
     </div>
   );

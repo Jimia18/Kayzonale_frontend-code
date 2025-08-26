@@ -1,282 +1,217 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Table, Button, Modal, Form, Spinner, Image } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import DashboardLayout from './dashboardLayout';
-import { Toast, ToastContainer } from "react-bootstrap";
+import { toast } from "react-toastify";
+import DashboardLayout from "../admin/dashboardLayout";
+import AdminSidebar from "../components/AdminSidebar";
 
-const ServiceManagement = () => {
+const ServiceManagement = ({ sidebarOpen, setSidebarOpen, isMobile }) => {
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [formMode, setFormMode] = useState("create"); // or 'edit'
-  const [formData, setFormData] = useState({
-    id: null,
-    name: "",
-    price: "",
-    description: "",
-  });
-  const [errors, setErrors] = useState({});
-  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [currentService, setCurrentService] = useState(null);
+  const [formData, setFormData] = useState({ name: "", description: "", image: null, preview: null });
 
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
+  const userType = localStorage.getItem("userRole");
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+  // Redirect if unauthorized
   useEffect(() => {
-    const fetchServices = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get("/api/v1/services", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setServices(res.data);
-      } catch (error) {
-        console.error("Failed to fetch services:", error);
-        showToast("Failed to load services", "danger");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!token || (userType !== "admin" && userType !== "staff")) {
+      toast.error("Access denied. Only admin/staff can access this page.");
+      navigate("/");
+    }
+  }, [token, userType, navigate]);
 
-    fetchServices();
-  }, [token]);
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (formData.price === "" || isNaN(formData.price) || Number(formData.price) < 0)
-      newErrors.price = "Price must be a positive number";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const showToast = (message, variant = "success") => {
-    setToast({ show: true, message, variant });
-    setTimeout(() => setToast({ show: false, message: "", variant: "" }), 3000);
-  };
-
-  const openCreateForm = () => {
-    setFormMode("create");
-    setFormData({ id: null, name: "", price: "", description: "" });
-    setErrors({});
-    setShowForm(true);
-  };
-
-  const openEditForm = (service) => {
-    setFormMode("edit");
-    setFormData({
-      id: service.id,
-      name: service.name,
-      price: service.price,
-      description: service.description || "",
-    });
-    setErrors({});
-    setShowForm(true);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  // Fetch services
+  const fetchServices = useCallback(async () => {
     try {
-      if (formMode === "create") {
-        await axios.post(
-          "/api/v1/services/create",
-          {
-            name: formData.name,
-            price: Number(formData.price),
-            description: formData.description,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        showToast("Service created successfully");
-      } else {
-        await axios.put(
-          `/api/v1/services/update/${formData.id}`,
-          {
-            name: formData.name,
-            price: Number(formData.price),
-            description: formData.description,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        showToast("Service updated successfully");
-      }
-
-      // Refresh services list
-      const res = await axios.get("/api/v1/services", {
+      setLoading(true);
+      const res = await axios.get(`${API_BASE_URL}/api/v1/services/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setServices(res.data);
-      setShowForm(false);
-    } catch (error) {
-      console.error("Error saving service:", error);
-      showToast("Failed to save service", "danger");
+    } catch (err) {
+      toast.error("Failed to load services");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, API_BASE_URL]);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    if (e.target.name === "image") {
+      const file = e.target.files[0];
+      setFormData({
+        ...formData,
+        image: file,
+        preview: file ? URL.createObjectURL(file) : null,
+      });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this service?")) return;
-
+  // Handle create/update
+  const handleSubmit = async () => {
     try {
-      await axios.delete(`/api/v1/services/delete/${id}`, {
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("description", formData.description);
+      if (formData.image) data.append("image", formData.image);
+
+      const config = {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+      };
+
+      if (currentService) {
+        await axios.put(`${API_BASE_URL}/api/v1/services/update/${currentService.id}`, data, config);
+        toast.success("Service updated");
+      } else {
+        await axios.post(`${API_BASE_URL}/api/v1/services/create`, data, config);
+        toast.success("Service created");
+      }
+
+      setShowModal(false);
+      setFormData({ name: "", description: "", image: null, preview: null });
+      setCurrentService(null);
+
+      fetchServices();
+    } catch (err) {
+      toast.error("Error saving service");
+      console.error(err);
+    }
+  };
+
+  // Handle edit
+  const handleEdit = (service) => {
+    setCurrentService(service);
+    setFormData({
+      name: service.name,
+      description: service.description,
+      image: null,
+      preview: service.image_url || null,
+    });
+    setShowModal(true);
+  };
+
+  // Handle delete
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+    try {
+      await axios.delete(`${API_BASE_URL}/api/v1/services/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setServices((prev) => prev.filter((s) => s.id !== id));
-      showToast("Service deleted successfully");
-    } catch (error) {
-      console.error("Error deleting service:", error);
-      showToast("Failed to delete service", "danger");
+      toast.success("Service deleted");
+      fetchServices();
+    } catch (err) {
+      toast.error("Failed to delete service");
+      console.error(err);
     }
   };
 
-  if (!token) {
-    // If no token, redirect to login or homepage
-    navigate("/");
-    return null;
-  }
-
   return (
-      <DashboardLayout
-        title="Service Management"
-        description="Add, edit, and delete services offered by your platform"
-      >
-        <div className="container mt-4">
-          <h2>Services Management</h2>
+    <DashboardLayout
+      title="Services"
+      description="Add, Edit, and Delete your Services"
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      isMobile={isMobile}
+      SidebarComponent={AdminSidebar}
+    >
+      <div className="py-4">
+        <Button onClick={() => setShowModal(true)} className="mb-3">
+          Add a Service
+        </Button>
 
-      {role === "admin" && (
-        <button className="btn btn-primary mb-3" onClick={openCreateForm}>
-          + Add Service
-        </button>
-      )}
-
-      {loading ? (
-        <p>Loading services...</p>
-      ) : services.length === 0 ? (
-        <p>No services found.</p>
-      ) : (
-        <table className="table table-bordered">
-          <thead className="table-light">
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Price (UGX)</th>
-              {role === "admin" && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {services.map((service) => (
-              <tr key={service.id}>
-                <td>{service.name}</td>
-                <td>{service.description}</td>
-                <td>{service.price}</td>
-                {role === "admin" && (
-                  <td>
-                    <button
-                      className="btn btn-sm btn-warning me-2"
-                      onClick={() => openEditForm(service)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDelete(service.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                )}
+        {loading ? (
+          <Spinner animation="border" />
+        ) : (
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th style={{ width: "600px" }}>Description</th>
+                <th>Image</th>
+                <th style={{ width: "100px" }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {services.map((s, index) => (
+                <tr key={s.id}>
+                  <td>{index + 1}</td>
+                  <td>{s.name}</td>
+                  <td>{s.description}</td>
+                  <td>
+                    {s.image_url && (
+                      <Image
+                        src={s.image_url.startsWith("http") ? s.image_url : `${API_BASE_URL}/${s.image_url.replace(/^\/+/, "")}`}
+                        alt={s.name}
+                        thumbnail
+                        style={{ width: "100px" }}
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <Button variant="info" size="sm" onClick={() => handleEdit(s)}>
+                      Edit
+                    </Button>{" "}
+                    <Button variant="danger" size="sm" onClick={() => handleDelete(s.id)}>
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
 
-      {showForm && (
-        <div className="card p-3 mb-4">
-          <h4>{formMode === "create" ? "Add New Service" : "Edit Service"}</h4>
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                Name *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                value={formData.name}
-                onChange={handleChange}
-                required
-                autoFocus
-              />
-              <div className="invalid-feedback">{errors.name}</div>
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="price" className="form-label">
-                Price (UGX) *
-              </label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                className={`form-control ${errors.price ? "is-invalid" : ""}`}
-                value={formData.price}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                required
-              />
-              <div className="invalid-feedback">{errors.price}</div>
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="description" className="form-label">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                className="form-control"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3}
-              />
-            </div>
-
-            <button type="submit" className="btn btn-success me-2">
-              {formMode === "create" ? "Create" : "Update"}
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setShowForm(false)}
-            >
+        {/* Modal */}
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>{currentService ? "Edit Service" : "Add Service"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Name</Form.Label>
+                <Form.Control name="name" value={formData.name} onChange={handleChange} />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control as="textarea" rows={3} name="description" value={formData.description} onChange={handleChange} />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Image</Form.Label>
+                <Form.Control type="file" name="image" onChange={handleChange} />
+              </Form.Group>
+              {formData.preview && (
+                <div className="mb-3 text-center">
+                  <Image src={formData.preview} alt="Preview" thumbnail style={{ maxHeight: "150px" }} />
+                </div>
+              )}
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
-            </button>
-          </form>
-        </div>
-      )}
-
-      <ToastContainer position="top-end" className="p-3">
-        <Toast
-          bg={toast.variant}
-          onClose={() => setToast({ show: false, message: "", variant: "" })}
-          show={toast.show}
-          delay={3000}
-          autohide
-        >
-          <Toast.Body className="text-white">{toast.message}</Toast.Body>
-        </Toast>
-      </ToastContainer>
-    </div>
-        </DashboardLayout>
+            </Button>
+            <Button variant="primary" onClick={handleSubmit}>
+              {currentService ? "Update" : "Create"}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    </DashboardLayout>
   );
 };
 

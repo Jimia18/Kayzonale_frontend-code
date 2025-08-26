@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const services = [
+const hardcodedServices = [
   {
     title: "Print Solutions",
     description:
@@ -45,15 +46,47 @@ const services = [
   },
 ];
 
+
+
 const ServicesPage = () => {
+  const [dynamicServices, setDynamicServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/v1/services/public");
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+        setDynamicServices(
+          res.data.map((s) => ({
+            title: s.title,
+            description: s.description,
+            src: s.src
+              ? `${API_BASE_URL}/${s.src.replace(/^\/+/, "")}` // ensure clean path
+              : `${API_BASE_URL}/static/uploads/services/default-service.jpg`,
+            alt: s.title,
+          }))
+        );
+
+      } catch (err) {
+        console.error("Failed to load dynamic services", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const allServices = [...hardcodedServices, ...dynamicServices];
+
   return (
     <>
       {/* Hero Section */}
       <section
         className="py-5 text-center text-white"
-        style={{
-          background: "linear-gradient(135deg, #e3eef3ff 0%, #d6e8ebff 100%)",
-        }}
+        style={{ background: "linear-gradient(135deg, #e3eef3ff 0%, #d6e8ebff 100%)" }}
       >
         <h1 className="fw-bold mb-2">Our Services</h1>
         <p className="fs-5">
@@ -66,29 +99,23 @@ const ServicesPage = () => {
 
       {/* Services Section */}
       <div
-        className="container-fluid  py-5 px-md-5 rounded"
-        style={{
-          background: "linear-gradient(135deg, #f4d9f6 0%, #d0f3f8 100%)",
-        }}
+        className="container-fluid py-5 px-md-5 rounded"
+        style={{ background: "linear-gradient(135deg, #f4d9f6 0%, #d0f3f8 100%)" }}
       >
-        {services.map(({ title, description, src, alt }, index) => (
+        {loading && dynamicServices.length === 0 && <p className="text-center">Loading services...</p>}
+        {allServices.map(({ title, description, src, alt }, index) => (
           <div
-            className={`row align-items-center mb-5 g-5 ${
-              index % 2 === 1 ? "flex-row-reverse" : ""
-            }`}
-            key={title}
+            className={`row align-items-center mb-5 g-5 ${index % 2 === 1 ? "flex-row-reverse" : ""}`}
+            key={title + index}
           >
             {/* Image */}
             <div className="col-md-5 text-center">
-              <div className="p-4  h-100 d-flex justify-content-center align-items-center hover-scale">
+              <div className="p-4 h-100 d-flex justify-content-center align-items-center hover-scale">
                 <img
                   src={src}
                   alt={alt}
                   className="img-fluid"
-                  style={{
-                    maxHeight: "250px",
-                    objectFit: "contain",
-                  }}
+                  style={{ maxHeight: "250px", objectFit: "contain" }}
                 />
               </div>
             </div>
@@ -103,15 +130,14 @@ const ServicesPage = () => {
             </div>
           </div>
         ))}
-        </div>
+      </div>
 
-        {/* Final Call to Action */}
-        <div className="text-center mt-5">
-          <a href="/contact" className="btn btn-lg btn-primary px-5 shadow">
-            Contact Us for a Quote
-          </a>
-        </div>
-      
+      {/* Final Call to Action */}
+      <div className="text-center mt-5">
+        <a href="/contact" className="btn btn-lg btn-primary px-5 shadow">
+          Contact Us for a Quote
+        </a>
+      </div>
 
       {/* Extra Styling */}
       <style jsx>{`
