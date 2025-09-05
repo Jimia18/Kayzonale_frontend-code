@@ -21,10 +21,9 @@ import Products from './pages/products';
 
 // Admin Pages
 import UsersPage from './admin/showUsers';
-import OrderManagement from './admin/orderManagement';
+import DashboardOrders from './admin/orderManagement';
 import ClientManagement from './admin/clientManagement';
 import ServiceManagement from './admin/serviceManagement';
-import ProjectManagement from './admin/projectManagement';
 import AdminDashboard from './admin/adminDashboard';
 import DashboardProducts from './admin/productManagement';
 
@@ -84,9 +83,8 @@ const Layout = () => {
         <Route path="/admin"element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>}/>
         <Route path="/admin/showUsers"element={<ProtectedRoute requiredRole="admin"><UsersPage /></ProtectedRoute>}/>
         <Route path="/admin/clientManagement"element={<ProtectedRoute requiredRole="admin"><ClientManagement /></ProtectedRoute>}/>
-        <Route path="/admin/orderManagement"element={<ProtectedRoute requiredRole="admin"><OrderManagement /></ProtectedRoute>}/>
+        <Route path="/admin/orderManagement"element={<ProtectedRoute requiredRole="admin"><DashboardOrders /></ProtectedRoute>}/>
         <Route path="/admin/serviceManagement"element={<ProtectedRoute requiredRole="admin"><ServiceManagement /></ProtectedRoute>}/>
-        <Route path="/admin/projectManagement"element={<ProtectedRoute requiredRole="admin"><ProjectManagement /></ProtectedRoute> }/>
         <Route path="/admin/productManagement"element={<ProtectedRoute requiredRole="admin"><DashboardProducts /></ProtectedRoute>}/>
       </Routes>
 

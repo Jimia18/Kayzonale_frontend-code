@@ -211,12 +211,7 @@ const AdminSidebar = ({ show, onHide, isMobile }) => {
               </div>
             </Collapse>
           </Nav.Item> 
-          <Nav.Item>
-            <NavLink to="/admin/projectManagement" className="nav-link text-white" onClick={onHide}>
-              Projects
-            </NavLink>
-          </Nav.Item>
-
+          
           <Nav.Item>
             <NavLink to="/admin/showUsers" className="nav-link text-white" onClick={onHide}>
               Show Users

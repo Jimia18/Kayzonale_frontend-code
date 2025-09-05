@@ -20,7 +20,7 @@ const Footer = () => {
           { href: 'https://twitter.com', icon: faTwitter, label: 'Twitter' },
           { href: 'https://instagram.com', icon: faInstagram, label: 'Instagram' },
           { href: 'https://youtube.com', icon: faYoutube, label: 'YouTube' },
-          { href: 'https://tiktok.com', icon: faTiktok, label: 'Tiktok' },
+          { href: 'https://tiktok/kayzonale designs & Printers.com', icon: faTiktok, label: 'Tiktok' },
         ].map(({ href, icon, label }) => (
           <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="social-link hover-toggle">
             <span className="text">{label}</span>
@@ -63,8 +63,8 @@ const Footer = () => {
             <ul className="list-unstyled fs-6">
               <li><a href="/brand-packs" className="footer-link">Brand Pack Packages</a></li>
               <li><a href="/faq" className="footer-link">Frequently Asked Questions</a></li>
-              <li><a href="/request-quote" className="footer-link">Request a Quote</a></li>
-              <li><a href="/customize-design" className="footer-link">Customize Design</a></li>
+              <li><a href="/getQuote" className="footer-link">Request a Quote</a></li>
+              <li><a href="/getQuote" className="footer-link">Customize Design</a></li>
             </ul>
           </div>
 

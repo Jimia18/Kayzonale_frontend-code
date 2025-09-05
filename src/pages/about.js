@@ -5,10 +5,18 @@ const AboutPage = () => {
   return (
     <div>
 
-      {/* ABOUT US Hero Section with background image and light blue overlay */}
-      <section className="position-relative text-white  d-flex justify-content-left align-items-left about-hero">
-        <div className="overlay position-absolute w-100 h-100"></div>
-        <h1 className="position-relative display-1 fw-bold z-1">ABOUT<br />US</h1>
+      {/* Hero Section */}
+      <section
+        className="py-5 text-center text-white"
+        style={{ background: "linear-gradient(135deg, #e3eef3ff 0%, #d6e8ebff 100%)" }}
+      >
+        <h1 className="fw-bold mb-2">About Us</h1>
+        <p className="fs-5">
+          <a href="/" className="text-white text-decoration-none opacity-75">
+            Home
+          </a>{" "}
+          — <span className="fw-semibold">About Us</span>
+        </p>
       </section>
 
       {/* Vision & Mission */}

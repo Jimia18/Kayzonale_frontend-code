@@ -45,7 +45,7 @@ const ProductCard = ({ product, viewMode }) => {
 
   if (viewMode === "grid") {
     return (
-      <Card className="h-100 shadow-sm">
+      <Card className="h-100 shadow-sm interactive-card">
         <Card.Img
           variant="top"
           src={imageUrl}

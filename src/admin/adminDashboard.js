@@ -4,6 +4,7 @@ import DashboardLayout from "./dashboardLayout";
 import AdminSidebar from "../components/AdminSidebar";
 import { Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({});
@@ -13,6 +14,17 @@ const AdminDashboard = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
+  const userType = localStorage.getItem("userRole");
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+  useEffect(() => {
+    if (!token || (userType !== "admin" && userType !== "staff")) {
+      toast.error("Access denied. Only admin/staff can access this page.");
+      navigate("/");
+    }
+  }, [token, userType, navigate]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 992);
@@ -20,24 +32,20 @@ const AdminDashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Function to get token from localStorage/sessionStorage
-  const getToken = () => {
-    return localStorage.getItem("token") || sessionStorage.getItem("token");
-  };
-
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const token = getToken();
-        if (!token) throw new Error("No auth token found");
-
-        const headers = { Authorization: `Bearer ${token}` };
-
         const [statsRes, ordersRes, paymentsRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/v1/orders/stats", { headers }),
-          axios.get("http://localhost:5000/api/v1/orders/filter?limit=5", { headers }),
-          axios.get("http://localhost:5000/api/v1/orders/report/financial", { headers }),
+          axios.get(`${API_BASE_URL}/api/v1/orders/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/v1/orders/filter?limit=5`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${API_BASE_URL}/api/v1/orders/report/financial`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         setStats(statsRes.data);
@@ -52,7 +60,7 @@ const AdminDashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [API_BASE_URL, token]);
 
   const renderSpinner = () => (
     <div className="text-center py-4">
@@ -174,8 +182,7 @@ const AdminDashboard = () => {
                   {
                     key: "created_at",
                     header: "Date",
-                    render: (item) =>
-                      new Date(item.created_at).toLocaleDateString(),
+                    render: (item) => new Date(item.created_at).toLocaleDateString(),
                   },
                 ])}
           </div>
@@ -193,15 +200,13 @@ const AdminDashboard = () => {
                   {
                     key: "amount",
                     header: "Amount",
-                    render: (item) =>
-                      `UGX ${Number(item.amount).toLocaleString()}`,
+                    render: (item) => `UGX ${Number(item.amount).toLocaleString()}`,
                   },
                   { key: "method", header: "Method" },
                   {
                     key: "created_at",
                     header: "Date",
-                    render: (item) =>
-                      new Date(item.created_at).toLocaleDateString(),
+                    render: (item) => new Date(item.created_at).toLocaleDateString(),
                   },
                 ])}
           </div>
