@@ -13,6 +13,7 @@ const UsersPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false); // 👈 for Add User
   const isMobile = window.innerWidth <= 768;
 
   const token =
@@ -96,6 +97,12 @@ const UsersPage = () => {
         </div>
       ) : (
         <>
+          <div className="d-flex justify-content-end mb-3">
+            <Button variant="success" onClick={() => setShowAddModal(true)}>
+              + Add User
+            </Button>
+          </div>
+
           <Table striped bordered hover responsive>
             <thead>
               <tr>
@@ -149,6 +156,14 @@ const UsersPage = () => {
             </tbody>
           </Table>
 
+          {/* Add User Modal */}
+          <AddUserModal
+            show={showAddModal}
+            onHide={() => setShowAddModal(false)}
+            onAdd={fetchUsers}
+            token={token}
+          />
+
           {/* Edit User Modal */}
           {editUser && (
             <EditUserModal
@@ -167,8 +182,131 @@ const UsersPage = () => {
 
 export default UsersPage;
 
-// ---------------- EditUserModal Component ----------------
+// ---------------- AddUserModal Component ----------------
+const AddUserModal = ({ show, onHide, onAdd, token }) => {
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    contact: "",
+    password: "",
+    user_type: "staff",
+  });
 
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        "http://localhost:5000/api/v1/users/add",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("User added successfully");
+      onHide();
+      onAdd(); // refresh users
+    } catch (error) {
+      console.error("Error adding user:", error);
+      toast.error(error.response?.data?.error || "Failed to add user");
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={onHide} centered>
+      <Form onSubmit={handleSubmit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-2">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Contact</Form.Label>
+            <Form.Control
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>User Type</Form.Label>
+            <Form.Select
+              name="user_type"
+              value={formData.user_type}
+              onChange={handleChange}
+            >
+              <option value="admin">Admin</option>
+              <option value="client">Client</option>
+              <option value="staff">Staff</option>
+            </Form.Select>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide}>
+            Cancel
+          </Button>
+          <Button variant="success" type="submit">
+            Add User
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  );
+};
+
+// ---------------- EditUserModal Component ----------------
 const EditUserModal = ({ user, show, onHide, onUpdate, token }) => {
   const [formData, setFormData] = useState({
     first_name: user.first_name,
@@ -263,7 +401,7 @@ const EditUserModal = ({ user, show, onHide, onUpdate, token }) => {
             >
               <option value="admin">Admin</option>
               <option value="client">Client</option>
-              <option  value= "staff">Staff</option>
+              <option value="staff">Staff</option>
             </Form.Select>
           </Form.Group>
         </Modal.Body>
