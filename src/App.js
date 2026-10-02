@@ -31,7 +31,7 @@ import DashboardProducts from './admin/productManagement';
 import { CartProvider } from './components/cartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/header';
-import Footer from './components/Footer';
+import Footer from './components/footer';
 import FloatingWhatsApp from './components/floatingWhatsap';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -89,7 +89,7 @@ const Layout = () => {
       </Routes>
 
       {!hideLayout && <FloatingWhatsApp />}
-      {!hideLayout && <Footer />}
+      {!hideLayout && <footer />}
     </>
   );
 };
